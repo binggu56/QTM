@@ -25,8 +25,6 @@
 
 !------------trajectory initial allocate------------------------
 
-!      real*8, dimension(NATOM3,Ntraj)   :: x,p,ap,ar,rp,du,fr
-
       real*8, dimension(NATOM3)         :: p0,alpha,x0,cf
 
       real*8, allocatable, dimension(:)   :: w,pe,ke,wp
@@ -39,7 +37,6 @@
 
       real*8, allocatable, dimension(:,:) :: cp,cr,cp2,cr2,cpr
 
-!      real*8, allocatable, dimension(:,:) 
       real*8 :: gasdev
 
 !------------------------------------------------------
@@ -60,7 +57,6 @@
       parameter (half=0.5d0)
       parameter (one=1.0d0)
 
-
       tag = 1
 
 ! --- initialize mpi environment
@@ -79,12 +75,12 @@
         open(12, file='traj.dat', status='new', action='write')
 
 
-!------read parameters from IN----------------------      
+!---- read variables from IN
       open(10,file='IN', status='old', action='read')
 
       read(10,*) ntraj
       read(10,*) kmax,dt
-      read(18,*) am0
+      read(10,*) am0
       read(10,*) a0
       read(10,*) cf0
       read(10,*) iread
@@ -92,7 +88,6 @@
       close(10)
 
 ! --- initialization.
-!-----------------------------------------------------
 
 !      call tstamp
 
@@ -118,6 +113,7 @@
 
 
 ! --- passing input variables to other procs
+
       call mpi_bcast(ntraj,1,mpi_integer,root,
      +               mpi_comm_world,ierr)
 
@@ -138,13 +134,12 @@
       Ndim = NATOM3
 
 !      den = 5.231d-3
-      ! Hinde 
-      den = 4.61421d-3 
+      den = 4.61421d-3 ! Hinde 
 
+! --- num of trajectories ppn 
       ntraj_proc = ntraj/numprocs
 
       call vinit(r2min, bin)
-
 
       if(myid == root) then
 
@@ -164,7 +159,7 @@
 
 ! --- read crystal lattice points.
 
-      ltfile = 'ltfile'
+      ltfile = 'lattice-file-180'
 
       if (myid == 0) then
 
@@ -297,6 +292,7 @@
 6340  format ('supercell edge lengths [NN distances] = ', 3f10.5/)
 
       endif
+
 ! --- compute interacting pairs.
 
       do i=1, NATOMS
@@ -390,11 +386,8 @@
 
 !        read (10, end=600) (path(i, k), i=1, NATOM3)
 
-!------reduce the number of pairs-------------
+! --- reduce half the number of pairs 
       call reduce()
-
-!      print *,'nvpair2=',nvpair2
-!      print *,ivpair2(1,1),ivpair2(2,1)
 
 ! --- allocate local arrays x,p,rp 
       if (myid == root) then
@@ -418,7 +411,7 @@
       allocate(s1p(ndim+1,ndim+1),cpp(ndim+1,ndim),crp(ndim+1,ndim),
      +         cp2(4,ndim),cr2(4,ndim),cp(ndim+1,ndim),cr(ndim+1,ndim))
 
-! --- inital parameters 
+! --- initial parameters 
       
       dt2 = dt/2d0
       t   = 0d0
@@ -432,17 +425,13 @@
         cf(i) = cf0
       enddo
 
-
       if(myid == root) then
 
         w = 1d0/dble(ntraj)
-!      endif
 
-! --- initial setup for trajectories
+! ----- initial setup for trajectories
 
-!      if (myid == 0) then
-
-        write(*,6005) numprocs, ntraj_proc
+        write(*,6005) numprocs, ntraj_proc        
 6005    format('Num of cores                 =', i6/,
      +         'Num of trajectories per core =', i6)
 
@@ -493,6 +482,7 @@
         enddo
       enddo
       
+! --- continue job from last checkpoint
       elseif(iread == 1) then
 
       open(11, file = 'temp.dat')
@@ -545,9 +535,8 @@
 !        write(*,6678) time
 !6678    format('Scatter work finished. Time for scattering',f12.6/,
         write(*,6679) 
-6679    format('Now run trajectories...')
+6679    format('Now propagate quantum trajectories...')
       endif
-
 
 
 ! --- trajectories propagation
@@ -561,16 +550,13 @@
 
 
         call mpi_reduce(s1p,s1,(ndim+1)*(ndim+1),MPI_DOUBLE_PRECISION,
-     +                  MPI_SUM,
-     +                  root,MPI_COMM_WORLD,ierr)
+     +                  MPI_SUM,root,MPI_COMM_WORLD,ierr)
       
         call mpi_reduce(cpp,cp,(ndim+1)*ndim,MPI_DOUBLE_PRECISION,
-     +                  MPI_SUM,
-     +                  root,MPI_COMM_WORLD,ierr)
+     +                  MPI_SUM,root,MPI_COMM_WORLD,ierr)
       
         call mpi_reduce(crp,cr,(ndim+1)*ndim,MPI_DOUBLE_PRECISION,
-     +                  MPI_SUM,
-     +                  root,MPI_COMM_WORLD,ierr)
+     +                  MPI_SUM,root,MPI_COMM_WORLD,ierr)
         
 !        time = mpi_wtime() - time
 
@@ -648,10 +634,6 @@
 !        call mpi_bcast(fr,ndim*ntraj,mpi_double_precision,root,
 !     +                   mpi_comm_world,ierr)
 
-!        if(myid == root) then
-!          print *,'scatter good'
-!        endif
-
 
 ! ----- wait until get info 
 !        call traj(myid,dt,ndim,ntraj_proc,am,x,p,rp,w,u,du,fr,ap,
@@ -704,6 +686,7 @@
 
 10    enddo
 
+! --- deallocate arrays
       deallocate(fr_proc,du_proc,ap_proc,x_proc,p_proc,rp_proc)
 
 
@@ -711,15 +694,15 @@
 
       if (myid == root) then
 
-!      open(13,file='temp.dat',action='write')
-!      
-!        do i=1,Ntraj
-!          do j=1,Ndim
-!            write(13,1000) x(j,i),p(j,i),rp(j,i)
-!          enddo
-!        enddo
-!
-!      close(13)
+      open(13,file='temp.dat',action='write')
+      
+        do i=1,Ntraj
+          do j=1,Ndim
+            write(13,1000) x(j,i),p(j,i),rp(j,i)
+          enddo
+        enddo
+
+      close(13)
 
       close(11)
       close(12)
