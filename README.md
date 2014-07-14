@@ -17,7 +17,8 @@ Ganrantee corrent version : 1.3.2, 1.4.0 (without long range)
 
 
 ############################################
-1.4.4 
+	1.4.4 
+###################################
 
 1. change mass and density to see the effects on PDF
 
@@ -34,7 +35,7 @@ Ganrantee corrent version : 1.3.2, 1.4.0 (without long range)
 
 
 ##################################
-      1.4.1
+	1.4.1
 
 1. add long-range correction
 
@@ -52,8 +53,7 @@ Ganrantee corrent version : 1.3.2, 1.4.0 (without long range)
 ###################################
       1.3.2 
 
-Date: 
-      5/5/2014
+Date: 5/5/2014
 
 Changes:
 
