@@ -548,7 +548,6 @@
         call prefit(ntraj_proc,ndim,wp,x_proc,p_proc,rp_proc,
      +              s1p,cpp,crp)
 
-
         call mpi_reduce(s1p,s1,(ndim+1)*(ndim+1),MPI_DOUBLE_PRECISION,
      +                  MPI_SUM,root,MPI_COMM_WORLD,ierr)
       
@@ -560,10 +559,9 @@
         
 !        time = mpi_wtime() - time
 
+! ----- linear fitting for the first step
         if (myid == root) then
-           
-!          write(*,6679) time
-!6679      format('time for prefit',f12.6)
+
 !          time = mpi_wtime()
           call fit(ntraj,ndim,cp,cr,s1,am,x,p,rp,w)
 !          time = mpi_wtime()-time
@@ -594,11 +592,9 @@
      +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
      +                  MPI_COMM_WORLD,ierr)
 
-!       do second fitting, root
+! ----  do second fitting, root
         if(myid == root) then
-
           call fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,rp)
-
         endif
 
 
@@ -639,12 +635,11 @@
 !        call traj(myid,dt,ndim,ntraj_proc,am,x,p,rp,w,u,du,fr,ap,
 !     +            proc_enk,proc_po,proc_qu)
              
-
 !          call mpi_barrier(mpi_comm_world, ierr)
 
+! ------- propagate trajectory in each proc for one time step
           call traj(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
-     +              rp_proc,ap_proc,wp,
-     +              du_proc,fr_proc,proc_po)
+     +              rp_proc,ap_proc,wp,du_proc,fr_proc,proc_po)
 
 
 ! ----- set values to 0 to do mpi_reduce to get the full {x(ndim,ntraj),p,r} matrix
@@ -667,8 +662,7 @@
         call mpi_reduce(proc_po,po,1,MPI_DOUBLE_PRECISION,MPI_SUM,
      +                  root,MPI_COMM_WORLD,ierr)
 
-
-        call MPI_REDUCE(eup,qu,1,MPI_DOUBLE_PRECISION,MPI_SUM,
+        call mpi_reduce(eup,qu,1,MPI_DOUBLE_PRECISION,MPI_SUM,
      +                  root,MPI_COMM_WORLD,ierr)
 
         if(myid == root) then

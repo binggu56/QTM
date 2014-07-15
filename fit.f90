@@ -128,8 +128,6 @@
       app = 0d0
       arp = 0d0
       
-!      time = mpi_wtime()
-
       do i=1,ntrp
         call basis(ndim,ntrp,i,xp,f)
         do j=1,ndim
@@ -142,8 +140,6 @@
 
       return
       end subroutine 
-
-!      time = mpddi_wtime()
 
 ! --- second step fitting, root 
       subroutine fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,r)
