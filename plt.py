@@ -2,6 +2,9 @@
 
 import numpy as np
 import pylab as pl
+import matplotlib as mpl
+
+mpl.rcParams['lines.linewidth'] = 2
 
 #with open("traj.dat") as f:
 #    data = f.read()
