@@ -1,19 +1,22 @@
       subroutine qpot(am,x,ntraj,ndim)
       implicit real*8(a-h,o-z)
+      
+! --- linear quantum force subroutine; fit {r} with linear basis {1,x1,x2,...}      
+      
       integer*4  :: Ntraj,Ndim
       real*8     :: w(Ntraj),x(Ndim,Ntraj),am(Ndim)
       real*8     :: qf(Ndim,Ntraj),qp(Ntraj)
       real*8 :: f(Ndim+1,Ntraj),r(Ndim,Ntraj)
-	real*8 :: s(Ndim+1,Ndim+1),c(Ndim+1,Ndim)
-!----- define c matrix ------------ 
-
-	c=0d0
-	do j=1,Ndim
-	  c(j,j)=-0.5d0
-	enddo
+      real*8 :: s(Ndim+1,Ndim+1),c(Ndim+1,Ndim)
+      
+!---- define c matrix
+      c=0d0
+      do j=1,Ndim
+	c(j,j)=-0.5d0
+       enddo
 	
-! basis vector f = (1,x(1),x(2),...,x(Ndim)) for each trajectory
-	f=0d0
+! --- basis vector f = (1,x(1),x(2),...,x(Ndim)) for each trajectory
+      f=0d0
       do i=1,Ntraj
 	  do j=1,Ndim
             f(j,i)=x(j,i)
@@ -21,7 +24,7 @@
           f(Ndim+1,i)=1d0
       enddo
 
-! Matrix S=f X f [Ndim+1,Ndim+1]
+! --- matrix S=f X f [Ndim+1,Ndim+1]
         s = 0d0
         do k1=1,Ndim+1
           do k2=1,Ndim+1
@@ -39,7 +42,7 @@
         stop
         end if
 
-!------------- the momentum operator r=cf-------------
+!----- the momentum operator r=cf-------------
 	r=0d0
 	qp=0d0
 !	qf=0d0
