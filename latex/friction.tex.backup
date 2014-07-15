@@ -1,0 +1,63 @@
+\documentclass[11pt]{revtex4}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{mystyle}
+\usepackage{amsmath}
+\usepackage{bm}
+
+\begin{document}
+\title{Computation of zero point energy from Bohmian trajectories with friction}
+\author{Bing Gu}
+\maketitle
+
+
+\section{Quantum molecular dynamics with dissipation}
+Quantum molecular dynamics with dissipation, relevant to many processes in chemistry, physics, and biology, is a long-standing theoretical challenge. Dissipation describes interaction of the actively rearranging “system” with the “bath,” representing the environmental degrees of freedom. With few exceptions, the numerically exact simulations of such quantum processes occurring in condensed phase, have been performed, using path integral Monte Carlo methods for models consisting of a low-dimensional system coupled to a bath of harmonic oscillators.2,3 Inclusion of friction directly into the \se may be viewed as a simple way to mimic the effect of energy transfer from the system to the environment while limiting quantum dynamics calculations to the system degrees of freedom. Such picture is simplistic, yet it might be useful for some processes. For example, the quantum transition state theory of dissipative tunneling reproduces measurement of the H/D motion on Pt(111) surface with few adjustable parameters.
+
+The force of friction, often taken for processes in condensed phase as linear in velocity of a particle, is most straightforwardly incorporated into equations of motion of a classical particle, characterized by position $x_t$ and momentum $p_t$, 
+\be \frac{dp_t}{dt}=-\frac{dV(x)}{dx}-\gamma p_t |_{x=x_t}, ~\frac{dx_t}{dt}=\frac{p_t}{m}. \ee
+The trajectory evolves under the influence of an external potential $V(x)$, which is a function of the Cartesian coordinate, $x$, parameter $\gamma$ denotes the friction coefficient.
+The friction term for the time-dependent \se (TDSE) can be incorporated into the Madelung-de Broglie-Bohm formulation of TDSE. The friction term depends on the phase of the evolving wavefunction. The resulting TDSE is nonlinear; the time-dependent wavefunction conserves normalization, while the total energy of the wavefunction decreases with time to the zero-point energy value.
+The new equations of motion with friction term for quantum trajectories are as follows:
+\begin{flalign} 
+	\frac{dp}{dt} &= -\frac{\partial}{\partial x} (V+U)-\gamma p. \label{eq:mom_fric} \\ 
+	\frac{dq}{dt} &= -\frac{p}{m} 
+\end{flalign}
+Integrating Eq. (\ref{eq:mom_fric}) with respect to $x$, the evolution of $S(x,t)$ with friction becomes
+\be -\frac{\pa S}{\pa t} = \frac{p^2}{2m} + V + U+ \gamma S + C(t). \label{eq:action_fric} \ee
+The constant of integration $C(t)$ can be defined on physical grounds: the overall phase of a wavefunction should not affect its evolution, including wavefunctions describing eigenstates. This requirement is satisfied by the choice, 
+\be C(t) = -\bra S(x,t) \ket. \ee
+Together with continuity equation unchanged by friction, the conventional TDSE with friction becomes 
+\be \imath \hbar \frac{\pa }{\pa t}\psi(x,t) = \hat{H}\psi(x,t) + \gamma (S - \bra S(x,t) \ket)\psi(x,t). \ee
+
+\section{Classical force}
+A pre-calculated potential describing the interaction of two helium atoms $V(r^2)$ is used to compute the potential for the whole system. The position vector $\vec{r}_{ij}$ between two helium atoms is defined as:
+\be \vec{r}_{ij} = -d\vec{r}_i + \vec{d}_{ij} + d\vec{r}_j, \ee
+where $d\vec{r}_i,~d\vec{r}_j$ are diplacement vectors for atom $i$ and $j$,
+\be d\vec{r}_i = \frac{dx_i}{|dr_i|}\vec{x} +  \frac{dy_i}{|dr_i|}\vec{y} + \frac{dz_i}{|dr_i|}\vec{z}. \ee 
+ 
+Since the interaction of two helilum atoms is expressed as a function of the square of the distance between two atoms, we need to use chain rule to compute the force on helium atoms,
+\be \frac{\partial V}{\partial dx_i} = \frac{\partial V}{\partial r_{ij}^2}\frac{\partial r^2_{ij}}{\partial dx_i}, \ee
+\be r^2_{ij} = (-dx_i+x_{ij}+dx_j)^2+(-dy_i+y_{ij}+dy_j)^2+(-dz_i+z_{ij}+dz_j)^2, \ee 
+\be \frac{\partial r^2_{ij}}{\partial dx_i} = 2(-dx_i+x_{ij}+dx_j). \ee 
+Finally, we get 
+\be \frac{\partial V}{\partial dx_i} =  2(-dx_i+x_{ij}+dx_j) \frac{\partial V}{\partial r_{ij}^2} \ee 
+
+\section{Long-range interactions correction}
+Long-range interactions are calculated in the same way as for the short-range interactions. The long-range interaction for each atom is approximated by a polynomial $P_{N_b}(x,y,z)$ on the basis of,   
+\be b = \{1,x,y,z,x^2,y^2,z^2,xy,yz,xz \}^T \ee, 
+\be P_{N_b}(x,y,z) = \bm{b}^T\bm{c} \ee. 
+We set up a three-dimensional grid of the displacements of atom on space and for each point $(x_i,y_i,z_i)$, we obtain the value of the long-range interaction $V_{l}(x_i,y_i,z_i)$ which is convergent to the number of atoms being used for the computation. Finally, we will get $N_p = N_x \times N_y \times N_z$ values and use these values to obtain the coefficients 
+\be \bm{c} = \{ c_1,c_2,...c_{N_b} \}^T \ee 
+before the each basis term. $N_b$ is the number of basis terms, which in this case is $10$.
+The coefficients can be obtained by solving the matrix equation
+\be \bf{M}\bm{c} = \bm{V_l}(x_i,y_i,z_i), \ee
+where $\bf{M}$ is an $N_p \times N_b$ matrix, for each line, the elements are 
+\be \bf{M}(i,j=1,\dots,N_b) = \{ 1,x_i,y_i,z_i,x_i^2,y_i^2,z_i^2,x_iy_i,y_iz_i,x_iz_i \}. \ee
+ 
+    
+
+     
+
+\end{document}
