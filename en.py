@@ -1,7 +1,8 @@
-##!/usr/bin/python
+#!/usr/bin/python
 
 import numpy as np
-import pylab as pl
+import pylab as plt
+import seaborn as sns
 
 #with open("traj.dat") as f:
 #    data = f.read()
@@ -32,7 +33,7 @@ pl.xlim(0,4)
 pl.title('two-steps fitting alg')
 pl.ylabel('Energy [hartree]')
 #pl.plot(data[:,0],data[:,2],'b--',linewidth=2,label='Potential')
-pl.plot(dat[:,0],dat[:,4],'r-',linewidth=2,label='lqf')
+#pl.plot(dat[:,0],dat[:,4],'r-',linewidth=2,label='lqf')
 #pl.plot(data[:,0],data[:,3],'g-.',linewidth=2,label='Quantum Potential')
 pl.plot(data[:,0],data[:,4],'k-',linewidth=2,label='Energy')
 #pl.legend(bbox_to_anchor=(0.5, 0.38, 0.42, .302), loc=3,ncol=1, mode="expand", borderaxespad=0.)
