@@ -683,7 +683,6 @@
 ! --- deallocate arrays
       deallocate(fr_proc,du_proc,ap_proc,x_proc,p_proc,rp_proc)
 
-
 ! --- record final data 
 
       if (myid == root) then
