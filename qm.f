@@ -530,7 +530,6 @@
 !       call mpi_bcast(cf,ndim,mpi_double_precision,root,
 !     +               mpi_comm_world,ierr)
 
-
       if(myid == root) then 
         time = mpi_wtime() - time
         write(*,6678) time
@@ -609,6 +608,7 @@
           write(*,6689) time
 6689      format('time to gather approximated p,r',f12.6/)
           call fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,rp)
+
         endif
 
         call MPI_BARRIER(mpi_comm_world,ierr)
