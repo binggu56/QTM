@@ -6,7 +6,7 @@
 #PBS -N helium_mpi
 
 #PBS -o log
-#PBS -l walltime=00:02:00,size=480
+#PBS -l walltime=00:03:00,size=240
 
 # specify number of procs
 
@@ -19,7 +19,7 @@ echo 'Started at' $(date)
 
 #ulimit -s unlimited
 #time mpirun -n $NSLOTS ./qm
-aprun -n 480 ./qm
+aprun -n 240 ./qm
    
 echo 'Ended at' $(date)
 exit 

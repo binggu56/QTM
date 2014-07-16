@@ -141,6 +141,8 @@
       return
       end subroutine 
 
+! --- 
+
 ! --- second step fitting, root 
       subroutine fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,r)
       
@@ -172,11 +174,17 @@
         do i=1,ntraj
           f2 = (/x(j,i),x(j,i)**2,x(j,i)**3,1d0/)
           do m=1,4
-            do n=1,4
+            do n=1,m
               s2(m,n) = s2(m,n)+f2(m)*f2(n)*w(i) 
             enddo
           enddo
-        enddo 
+        enddo
+
+        do m=2,4
+          do n=1,m-1
+            s2(n,m) = s2(m,n) 
+          enddo
+        enddo
         
         call dposv('U',4,2,s2,4,cpr,4,info)
         if(info/=0) then

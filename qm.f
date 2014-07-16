@@ -607,7 +607,17 @@
           time = mpi_wtime()-time
           write(*,6689) time
 6689      format('time to gather approximated p,r',f12.6/)
+
+          time = mpi_wtime()
+
+! ------- most time consuming part 
+
           call fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,rp)
+
+          time = mpi_wtime() - time
+
+          write(*,6691) time
+6691      format('time to do second fit at root',f12.6/)
 
         endif
 
@@ -657,6 +667,7 @@
 
 ! ----- set values to 0 to do mpi_reduce to get the full {x(ndim,ntraj),p,r} matrix
 ! ----- collect info from other nodes {x,p,r}, then compute quantum potential, by root
+        time = mpi_wtime()
 
         call MPI_GATHER(x_proc,ndim*ntraj_proc,mpi_double_precision,x,
      +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
@@ -679,6 +690,10 @@
      +                  root,MPI_COMM_WORLD,ierr)
 
         if(myid == root) then
+          
+          time = mpi_wtime() - time 
+          write(*,6690) time
+6690      format('time to gather {x,p,r}',f12.6/)
         
           call ave_k(ntraj,ndim,am,w,p,enk)
 
