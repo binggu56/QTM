@@ -33,7 +33,7 @@
 
       real*8, allocatable, dimension(:,:) :: ap_proc,du_proc,fr_proc,
      +                                       x_proc,p_proc,rp_proc,
-     +                                       s1,cpp,crp,s1p,arp
+     +       s1,cpp,crp,s1p,arp,cp2,cr2,s2p, cp2_sum,cr2_sum, s2_sum
 
       real*8, allocatable, dimension(:,:) :: cp,cr,cp2,cr2,cpr
 
@@ -389,19 +389,21 @@
 ! --- reduce half the number of pairs 
       call reduce()
 
-! --- allocate local arrays x,p,rp 
+! --- allocate local arrays x,p,rp for root only (only those arrays only
+!     exist at root proc) 
       if (myid == root) then
 
 !        time = mpi_wtime()
 
         allocate(s1(ndim+1,ndim+1),pe(ntraj),ke(ntraj),x(ndim,ntraj), 
      +           p(ndim,ntraj),ap(ndim,ntraj),ar(ndim,ntraj),
-     +           rp(ndim,ntraj),w(ntraj))
+     +           rp(ndim,ntraj),w(ntraj),s2_sum(16,ndim),
+     +           cp2_sum(4,ndim),cr2_sum(4,ndim))
       endif
 
-      allocate(wp(ntraj_proc),cpr(ndim+1,2*ndim))
-
 ! --- allocate arrays for all cores 
+
+        allocate(wp(ntraj_proc),cpr(ndim+1,2*ndim), s2p(ndim,4))
 
       allocate(fr_proc(ndim,ntraj_proc),du_proc(ndim,ntraj_proc),
      +         ap_proc(ndim,ntraj_proc),x_proc(ndim,ntraj_proc),
@@ -585,13 +587,13 @@
         call mpi_bcast(cr,(ndim+1)*ndim,mpi_double_precision,root,
      +                   mpi_comm_world,ierr)
 
-!       get approximate {p,r}, salve 
+! ----  get approximate {p,r}, salve 
         
         time = mpi_wtime()
 
         call aver(ndim,ntraj_proc,ntraj,x_proc,cp,cr,ap_proc,arp)
 
-!       collect approximated {ap,ar}
+! ----- collect approximated {ap,ar}
       
         call MPI_GATHER(ap_proc,ndim*ntraj_proc,mpi_double_precision,ap,
      +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
@@ -601,18 +603,34 @@
      +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
      +                  MPI_COMM_WORLD,ierr)
 
+! ---- compute averages of f*f, f= (1,x,x^2,x^3)
+
+        call aver_proc(ndim,ntraj_proc,wp,cp2,cr2,s2p)
+
+        call mpi_reduce(cp2,cp2_sum,ndim*4,
+     +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
+
+        call mpi_reduce(cr2,cr2_sum,ndim*4,
+     +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
+
+        call mpi_reduce(s2p,s2_sum,ndim*16,
+     +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
+
 ! ----  do second fitting, root
 
         if(myid == root) then
+
           time = mpi_wtime()-time
+
           write(*,6689) time
+
 6689      format('time to gather approximated p,r',f12.6/)
 
           time = mpi_wtime()
 
 ! ------- most time consuming part 
 
-          call fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,rp)
+          call fit2(ndim,ntraj,w,ap,ar,cp2,cr2,s2_sum)
 
           time = mpi_wtime() - time
 
@@ -681,7 +699,7 @@
 !     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
 !     +                  MPI_COMM_WORLD,ierr)
 !
-! ----- root, gather average values 
+! ----- root, gather energy components  
 
         call mpi_reduce(proc_po,po,1,MPI_DOUBLE_PRECISION,MPI_SUM,
      +                  root,MPI_COMM_WORLD,ierr)
@@ -691,7 +709,9 @@
 
         call mpi_reduce(enk_proc,enk,1,MPI_DOUBLE_PRECISION,MPI_SUM,
      +                  root,MPI_COMM_WORLD,ierr)
-     
+
+
+! ----- write data to files 
         if(myid == root) then
           
           time = mpi_wtime() - time 
@@ -713,18 +733,18 @@
 
 
 ! --- record final data 
-! ----- transfer data to output 
-        call MPI_GATHER(x_proc,ndim*ntraj_proc,mpi_double_precision,x,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
+! --- transfer data to output 
+      call MPI_GATHER(x_proc,ndim*ntraj_proc,mpi_double_precision,x,
+     +                ndim*ntraj_proc,mpi_double_precision,ROOT,
+     +                MPI_COMM_WORLD,ierr)
 
-        call MPI_GATHER(p_proc,ndim*ntraj_proc,mpi_double_precision,p,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
+      call MPI_GATHER(p_proc,ndim*ntraj_proc,mpi_double_precision,p,
+     +                ndim*ntraj_proc,mpi_double_precision,ROOT,
+     +                MPI_COMM_WORLD,ierr)
 
-        call MPI_GATHER(rp_proc,ndim*ntraj_proc,mpi_double_precision,rp,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
+      call MPI_GATHER(rp_proc,ndim*ntraj_proc,mpi_double_precision,rp,
+     +                ndim*ntraj_proc,mpi_double_precision,ROOT,
+     +                MPI_COMM_WORLD,ierr)
 
       if (myid == root) then
 
@@ -747,7 +767,7 @@
 
 
       write(*,1020) tot 
-1020  format('Total Energy =', f10.5/ ,
+1020  format('E(total) at final time step =', f10.5/ ,
      +       'MISSION COMPLETE.')
       
       endif ! root

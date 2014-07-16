@@ -148,7 +148,7 @@
       
       implicit real*8(a-h, o-z)
 
-      real*8 :: cp(4,ndim),cr(4,ndim),f2(4),s2p(ndim,16),wp(ntraj_proc)
+      real*8 :: cp(4,ndim),cr(4,ndim),f2(4),s2p(16,ndim),wp(ntraj_proc)
 
       dimloop:do j=1,ndim
         
@@ -159,14 +159,17 @@
         do i=1,ntraj_proc
           f = (/xp(j,i),xp(j,i)**2,xp(j,i)**3,1d0/)
           do k=1,4
-            cp(j,k) = cp(j,k)+(p_proc(j,i)-ap_proc(j,i))*f(k)*wp(i)
-            cr(j,k) = cr(j,k)+(r_proc(j,i)-ar_proc(j,i))*f(k)*wp(i)
+            cp(k,j) = cp(k,j)+(p_proc(j,i)-ap_proc(j,i))*f(k)*wp(i)
+            cr(k,j) = cr(k,j)+(r_proc(j,i)-ar_proc(j,i))*f(k)*wp(i)
           enddo
+
+! ------- would use the symmetry of s2p to reduce the length of
+!         s2p(ndim,nb**2) to (ndim,np!), now just use 4**2
 
           do m=1,4
             do n=1,4
               nn = 4*(m-1)+n
-              s2p(j,nn) = s2p(j,nn)+f(m)*f(n)*wp(i) 
+              s2p(nn,j) = s2p(nn,j)+f(m)*f(n)*wp(i) 
             enddo
           enddo
         enddo 
@@ -178,47 +181,60 @@
 
 ! --- second step fitting, root 
 
-      subroutine fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,r)
+      subroutine fit2(ndim,ntraj,w,ap,ar,cp2,cr2,s2_sum)
       
       implicit real*8(a-h,o-z)
 
       real*8 f2(4),x(ndim,ntraj),p(ndim,ntraj),r(ndim,ntraj), &
-             ap(ndim,ntraj),ar(ndim,ntraj),s2(4,4),cpr(4,2),w(ntraj)
+             ap(ndim,ntraj),ar(ndim,ntraj),s2_sum(16,ndim),cpr(4,2),w(ntraj) & 
+             vec(16), s2(4,4)
+             
 
       real*8, intent(out) :: cp2(4,ndim),cr2(4,ndim)
 
       dimloop:do j=1,ndim
         
+        do i=1,16 
+          vec(i) = s2_sum(i,j)
+        enddo 
+
+        s2 = RESHAPE(vec, (/4, 4/))
+
+        do i=1,4
+          cpr(i,1) = cp2(i,j)
+          cpr(i,2) = cp2(i,j)
+        enddo 
+
 !        do i=1,ntraj
 !          f2 = (/x(j,i),x(j,i)**2,x(j,i)**3,1d0/)
 !          df2 = (/1d0,2d0*x(j,i),3d0*x(j,i)**2,0d0/)
 !        enddo
 
-        cpr = 0d0
-
-        do i=1,ntraj
-          f2 = (/x(j,i),x(j,i)**2,x(j,i)**3,1d0/)
-          do k=1,4
-            cpr(k,1) = cpr(k,1)+(p(j,i)-ap(j,i))*f2(k)*w(i)
-            cpr(k,2) = cpr(k,2)+(r(j,i)-ar(j,i))*f2(k)*w(i)
-          enddo
-        enddo
-          
-        s2 = 0d0
-        do i=1,ntraj
-          f2 = (/x(j,i),x(j,i)**2,x(j,i)**3,1d0/)
-          do m=1,4
-            do n=1,m
-              s2(m,n) = s2(m,n)+f2(m)*f2(n)*w(i) 
-            enddo
-          enddo
-        enddo
-
-        do m=2,4
-          do n=1,m-1
-            s2(n,m) = s2(m,n) 
-          enddo
-        enddo
+!        cpr = 0d0
+!
+!        do i=1,ntraj
+!          f2 = (/x(j,i),x(j,i)**2,x(j,i)**3,1d0/)
+!          do k=1,4
+!            cpr(k,1) = cpr(k,1)+(p(j,i)-ap(j,i))*f2(k)*w(i)
+!            cpr(k,2) = cpr(k,2)+(r(j,i)-ar(j,i))*f2(k)*w(i)
+!          enddo
+!        enddo
+!          
+!        s2 = 0d0
+!        do i=1,ntraj
+!          f2 = (/x(j,i),x(j,i)**2,x(j,i)**3,1d0/)
+!          do m=1,4
+!            do n=1,m
+!              s2(m,n) = s2(m,n)+f2(m)*f2(n)*w(i) 
+!            enddo
+!          enddo
+!        enddo
+!
+!        do m=2,4
+!          do n=1,m-1
+!            s2(n,m) = s2(m,n) 
+!          enddo
+!        enddo
         
         call dposv('U',4,2,s2,4,cpr,4,info)
         if(info/=0) then
