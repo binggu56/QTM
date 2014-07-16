@@ -508,6 +508,7 @@
 
       endif ! root work end 
 
+      time = mpi_wtime()
 
 ! --- send required info {cf,x,p,r,w} for slave nodes 
       call mpi_scatter(x,ndim*ntraj_proc,mpi_double_precision,
@@ -531,20 +532,25 @@
 
 
       if(myid == root) then 
-!        time = mpi_wtime() - time
-!        write(*,6678) time
-!6678    format('Scatter work finished. Time for scattering',f12.6/,
+        time = mpi_wtime() - time
+        write(*,6678) time
+6678    format('Scatter work finished. Time for initial scattering',
+     +         f12.6/)
         write(*,6679) 
 6679    format('Now propagate quantum trajectories...')
       endif
 
 
 ! --- trajectories propagation
+
       do 10 kt=1,kmax
 
-        t=t+dt 
-!        time = mpi_wtime()
+        t=t+dt
+ 
+        time = mpi_wtime()
+
 ! ----- root, compute quantum force x(Ndim,Ntraj),p,r
+
         call prefit(ntraj_proc,ndim,wp,x_proc,p_proc,rp_proc,
      +              s1p,cpp,crp)
 
@@ -557,16 +563,18 @@
         call mpi_reduce(crp,cr,(ndim+1)*ndim,MPI_DOUBLE_PRECISION,
      +                  MPI_SUM,root,MPI_COMM_WORLD,ierr)
         
-!        time = mpi_wtime() - time
+        time = mpi_wtime() - time
 
 ! ----- linear fitting for the first step
         if (myid == root) then
+           write(*,6688) time
+6688       format('time to collect matrix elements',f12.6/)
 
-!          time = mpi_wtime()
+          time = mpi_wtime()
           call fit(ntraj,ndim,cp,cr,s1,am,x,p,rp,w)
-!          time = mpi_wtime()-time
-!          write(*,6680) time
-!6680      format('time to fit in root', f12.6)
+          time = mpi_wtime()-time
+          write(*,6680) time
+6680      format('time for linear fit at root', f12.6/)
         endif
 
 !        call MPI_BCAST(cpr,(ndim+1)*2*ndim,MPI_DOUBLE_PRECISION,root,
@@ -579,6 +587,8 @@
      +                   mpi_comm_world,ierr)
 
 !       get approximate {p,r}, salve 
+        
+        time = mpi_wtime()
 
         call aver(ndim,ntraj_proc,ntraj,x_proc,cp,cr,ap_proc,arp)
 
@@ -593,10 +603,13 @@
      +                  MPI_COMM_WORLD,ierr)
 
 ! ----  do second fitting, root
+
         if(myid == root) then
+          time = mpi_wtime()-time
+          write(*,6689) time
+6689      format('time to gather approximated p,r',f12.6/)
           call fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,rp)
         endif
-
 
         call MPI_BARRIER(mpi_comm_world,ierr)
 
