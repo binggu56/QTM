@@ -8,8 +8,8 @@ EXEC = qm
 #EXEC2 = cont
 #LIB = /usr/lib64/atlas/liblapack.so.3.0
 #LIB = -llapack  
-#LIB = -mkl=sequential 
-LIB = -mkl
+LIB = -mkl=parallel
+
 $(EXEC): $(objects)
 	$(FC) -o $(EXEC) $(FLAGS) $(LIB) $(switch) $(objects)
 #$(EXEC2): $(objects2)
