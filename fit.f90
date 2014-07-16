@@ -1,6 +1,6 @@
 !     polynomial fitting for {p,r}
 !     two steps: 1st global linear fitting; 2nd local fitting with basis up to third order 
-      subroutine fit(ntraj,ndim,cp,cr,s1,am,x,p,r,w)
+      subroutine fit(ntraj,ndim,cp,cr,s1,am,w)
 
       implicit real*8(a-h, o-z)
 
@@ -9,7 +9,7 @@
       integer*4,intent(in)    :: ndim
       real*8, intent(in), dimension(ntraj)  :: w
       real*8, intent(in), dimension(ndim) :: am
-      real*8, intent(in), dimension(ndim,ntraj) :: x,p,r
+!      real*8, intent(in), dimension(ndim,ntraj) :: x,p,r
 
       real*8, intent(in) :: s1(ndim+1,ndim+1)
 
@@ -141,9 +141,43 @@
       return
       end subroutine 
 
-! --- 
+! --- collect averages for second-step fitting
+!     for every processor 
+
+      subroutine aver_proc(ndim,ntraj_proc,wp,cp,cr,s2p) 
+      
+      implicit real*8(a-h, o-z)
+
+      real*8 :: cp(4,ndim),cr(4,ndim),f2(4),s2p(ndim,16),wp(ntraj_proc)
+
+      dimloop:do j=1,ndim
+        
+        cp = 0d0
+        cr = 0d0 
+        s2p = 0d0 
+
+        do i=1,ntraj_proc
+          f = (/xp(j,i),xp(j,i)**2,xp(j,i)**3,1d0/)
+          do k=1,4
+            cp(j,k) = cp(j,k)+(p_proc(j,i)-ap_proc(j,i))*f(k)*wp(i)
+            cr(j,k) = cr(j,k)+(r_proc(j,i)-ar_proc(j,i))*f(k)*wp(i)
+          enddo
+
+          do m=1,4
+            do n=1,4
+              nn = 4*(m-1)+n
+              s2p(j,nn) = s2p(j,nn)+f(m)*f(n)*wp(i) 
+            enddo
+          enddo
+        enddo 
+
+      enddo dimloop
+      
+      return
+      end subroutine
 
 ! --- second step fitting, root 
+
       subroutine fit2(ndim,ntraj,w,ap,ar,cp2,cr2,x,p,r)
       
       implicit real*8(a-h,o-z)

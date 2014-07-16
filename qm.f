@@ -570,7 +570,7 @@
 6688       format('time to collect matrix elements',f12.6/)
 
           time = mpi_wtime()
-          call fit(ntraj,ndim,cp,cr,s1,am,x,p,rp,w)
+          call fit(ntraj,ndim,cp,cr,s1,am,w)
           time = mpi_wtime()-time
           write(*,6680) time
 6680      format('time for linear fit at root', f12.6/)
@@ -662,25 +662,25 @@
 
 ! ------- propagate trajectory in each proc for one time step
           call traj(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
-     +              rp_proc,ap_proc,wp,du_proc,fr_proc,proc_po)
+     +            rp_proc,ap_proc,wp,du_proc,fr_proc,proc_po,enk_proc)
 
 
 ! ----- set values to 0 to do mpi_reduce to get the full {x(ndim,ntraj),p,r} matrix
 ! ----- collect info from other nodes {x,p,r}, then compute quantum potential, by root
-        time = mpi_wtime()
-
-        call MPI_GATHER(x_proc,ndim*ntraj_proc,mpi_double_precision,x,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
-
-        call MPI_GATHER(p_proc,ndim*ntraj_proc,mpi_double_precision,p,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
-
-        call MPI_GATHER(rp_proc,ndim*ntraj_proc,mpi_double_precision,rp,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
-
+!        time = mpi_wtime()
+!
+!        call MPI_GATHER(x_proc,ndim*ntraj_proc,mpi_double_precision,x,
+!     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+!     +                  MPI_COMM_WORLD,ierr)
+!
+!        call MPI_GATHER(p_proc,ndim*ntraj_proc,mpi_double_precision,p,
+!     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+!     +                  MPI_COMM_WORLD,ierr)
+!
+!        call MPI_GATHER(rp_proc,ndim*ntraj_proc,mpi_double_precision,rp,
+!     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+!     +                  MPI_COMM_WORLD,ierr)
+!
 ! ----- root, gather average values 
 
         call mpi_reduce(proc_po,po,1,MPI_DOUBLE_PRECISION,MPI_SUM,
@@ -689,13 +689,16 @@
         call mpi_reduce(eup,qu,1,MPI_DOUBLE_PRECISION,MPI_SUM,
      +                  root,MPI_COMM_WORLD,ierr)
 
+        call mpi_reduce(enk_proc,enk,1,MPI_DOUBLE_PRECISION,MPI_SUM,
+     +                  root,MPI_COMM_WORLD,ierr)
+     
         if(myid == root) then
           
           time = mpi_wtime() - time 
           write(*,6690) time
 6690      format('time to gather {x,p,r}',f12.6/)
         
-          call ave_k(ntraj,ndim,am,w,p,enk)
+!          call ave_k(ntraj,ndim,am,w,p,enk)
 
           tot = po+enk+qu
 
@@ -708,10 +711,20 @@
 
 10    enddo
 
-! --- deallocate arrays
-      deallocate(fr_proc,du_proc,ap_proc,x_proc,p_proc,rp_proc)
 
 ! --- record final data 
+! ----- transfer data to output 
+        call MPI_GATHER(x_proc,ndim*ntraj_proc,mpi_double_precision,x,
+     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+     +                  MPI_COMM_WORLD,ierr)
+
+        call MPI_GATHER(p_proc,ndim*ntraj_proc,mpi_double_precision,p,
+     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+     +                  MPI_COMM_WORLD,ierr)
+
+        call MPI_GATHER(rp_proc,ndim*ntraj_proc,mpi_double_precision,rp,
+     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+     +                  MPI_COMM_WORLD,ierr)
 
       if (myid == root) then
 
@@ -727,6 +740,11 @@
 
       close(11)
       close(12)
+
+
+! --- deallocate arrays
+      deallocate(fr_proc,du_proc,ap_proc,x_proc,p_proc,rp_proc)
+
 
       write(*,1020) tot 
 1020  format('Total Energy =', f10.5/ ,
@@ -850,26 +868,26 @@
 !--------------------------------------
 !     average of K(x,t)
 !-----------------------------------------
-      subroutine ave_k(ntraj,ndim,am,w,p,enk)
-      
-!      use cdat,only: ntraj
-
-      implicit real*8(a-h,o-z)
-
-      integer*4,intent(in)  :: ndim, ntraj
-      real*8     :: w(ntraj),p(ndim,ntraj),am(ndim)
-
-
-      enk = 0d0
-
-      do i=1,ntraj
-        do j=1,ndim
-          enk = enk +w(i)*p(j,i)**2/2d0/am(j)
-        enddo
-      enddo
-
-      return
-      end subroutine
+!      subroutine ave_k(ntraj,ndim,am,w,p,enk)
+!      
+!!      use cdat,only: ntraj
+!
+!      implicit real*8(a-h,o-z)
+!
+!      integer*4,intent(in)  :: ndim, ntraj
+!      real*8     :: w(ntraj),p(ndim,ntraj),am(ndim)
+!
+!
+!      enk = 0d0
+!
+!      do i=1,ntraj
+!        do j=1,ndim
+!          enk = enk +w(i)*p(j,i)**2/2d0/am(j)
+!        enddo
+!      enddo
+!
+!      return
+!      end subroutine
 
 ! ---------------------------------------------------------------
 !     average over trajectories
@@ -898,7 +916,7 @@
 ! ----------------------------------------------------------------
       subroutine traj(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
      +                rp_proc,ap_proc,wp,
-     +                du_proc,fr_proc,proc_po)
+     +                du_proc,fr_proc,proc_po,enk_proc)
 
       use cdat
 
@@ -968,10 +986,18 @@
 !        enddo
 
 !-------update potential, kinetic, and total energy each proc
-         proc_po = 0d0
-          do i = 1,Ntraj_proc
-            proc_po = pe(i)*wp(i)+proc_po
-          enddo
+      enk_proc = 0d0 
+      do i=1,Ntraj_proc 
+        do j=1,ndim
+          enk_proc = enk_proc+p(j,i)**2/(2d0*m(j))
+        enddo 
+      enddo 
+      
+      proc_po = 0d0
+
+      do i = 1,Ntraj_proc
+        proc_po = pe(i)*wp(i)+proc_po
+      enddo
 
 !          write(101,1000) t,(x(1,i),i=1,20)
 !          write(102,1000) t,(x(j,4),j=1,20)
