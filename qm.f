@@ -605,7 +605,8 @@
 
 ! ---- compute averages of f*f, f= (1,x,x^2,x^3)
 
-        call aver_proc(ndim,ntraj_proc,wp,cp2,cr2,s2p)
+        call  aver_proc(ndim,ntraj_proc,wp,cp,cr,s2p,x_proc,p_proc,
+     +                  rp_proc, ap_proc,arp) 
 
         call mpi_reduce(cp2,cp2_sum,ndim*4,
      +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
@@ -630,7 +631,7 @@
 
 ! ------- most time consuming part 
 
-          call fit2(ndim,ntraj,w,ap,ar,cp2,cr2,s2_sum)
+          call fit2(ndim,ntraj,w,cp2,cr2,s2_sum)
 
           time = mpi_wtime() - time
 
@@ -1009,7 +1010,7 @@
       enk_proc = 0d0 
       do i=1,Ntraj_proc 
         do j=1,ndim
-          enk_proc = enk_proc+p(j,i)**2/(2d0*m(j))
+          enk_proc = enk_proc+p_proc(j,i)**2/(2d0*am(j))
         enddo 
       enddo 
       

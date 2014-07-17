@@ -144,11 +144,16 @@
 ! --- collect averages for second-step fitting
 !     for every processor 
 
-      subroutine aver_proc(ndim,ntraj_proc,wp,cp,cr,s2p) 
+      subroutine aver_proc(ndim,ntraj_proc,wp,cp,cr,s2p,x_proc,p_proc,r_proc, & 
+                           ap_proc,ar_proc) 
       
       implicit real*8(a-h, o-z)
 
-      real*8 :: cp(4,ndim),cr(4,ndim),f2(4),s2p(16,ndim),wp(ntraj_proc)
+      real*8 :: cp(4,ndim),cr(4,ndim),f(4),s2p(16,ndim),wp(ntraj_proc)
+
+      real*8 :: ap_proc(ndim,ntraj_proc), ar_proc(ndim,ntraj_proc), & 
+                x_proc(ndim,ntraj_proc), p_proc(ndim,ntraj_proc), & 
+                r_proc(ndim,ntraj_proc)
 
       dimloop:do j=1,ndim
         
@@ -157,7 +162,7 @@
         s2p = 0d0 
 
         do i=1,ntraj_proc
-          f = (/xp(j,i),xp(j,i)**2,xp(j,i)**3,1d0/)
+          f = (/x_proc(j,i),x_proc(j,i)**2,x_proc(j,i)**3,1d0/)
           do k=1,4
             cp(k,j) = cp(k,j)+(p_proc(j,i)-ap_proc(j,i))*f(k)*wp(i)
             cr(k,j) = cr(k,j)+(r_proc(j,i)-ar_proc(j,i))*f(k)*wp(i)
@@ -172,6 +177,7 @@
               s2p(nn,j) = s2p(nn,j)+f(m)*f(n)*wp(i) 
             enddo
           enddo
+
         enddo 
 
       enddo dimloop
@@ -181,28 +187,32 @@
 
 ! --- second step fitting, root 
 
-      subroutine fit2(ndim,ntraj,w,ap,ar,cp2,cr2,s2_sum)
+      subroutine fit2(ndim,ntraj,w,cp2,cr2,s2_sum)
       
       implicit real*8(a-h,o-z)
 
-      real*8 f2(4),x(ndim,ntraj),p(ndim,ntraj),r(ndim,ntraj), &
-             ap(ndim,ntraj),ar(ndim,ntraj),s2_sum(16,ndim),cpr(4,2),w(ntraj) & 
-             vec(16), s2(4,4)
+      real*8 :: f2(4), &
+             s2_sum(16,ndim),cpr(4,2),w(ntraj), & 
+             f(16), s2(4,4)
              
-
-      real*8, intent(out) :: cp2(4,ndim),cr2(4,ndim)
+      real*8, intent(inout) :: cp2(4,ndim),cr2(4,ndim)
 
       dimloop:do j=1,ndim
         
         do i=1,16 
-          vec(i) = s2_sum(i,j)
+          f(i) = s2_sum(i,j)
         enddo 
 
-        s2 = RESHAPE(vec, (/4, 4/))
+        do m=1,4
+          do n=1,4
+            l = 4*(m-1)+n
+            s2(m,n) = s2_sum(l,j)
+          enddo 
+        enddo 
 
         do i=1,4
           cpr(i,1) = cp2(i,j)
-          cpr(i,2) = cp2(i,j)
+          cpr(i,2) = cr2(i,j)
         enddo 
 
 !        do i=1,ntraj
@@ -220,7 +230,7 @@
 !          enddo
 !        enddo
 !          
-!        s2 = 0d0
+!        s2 = 0d0`
 !        do i=1,ntraj
 !          f2 = (/x(j,i),x(j,i)**2,x(j,i)**3,1d0/)
 !          do m=1,4
