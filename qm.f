@@ -33,7 +33,7 @@
 
       real*8, allocatable, dimension(:,:) :: ap_proc,du_proc,fr_proc,
      +                                       x_proc,p_proc,rp_proc,
-     +       s1,cpp,crp,s1p,arp,cp2,cr2,s2p, cp2_sum,cr2_sum, s2_sum
+     +       s1,cpp,crp,s1p,ar_proc,cp2,cr2,s2p, cp2_sum,cr2_sum, s2_sum
 
       real*8, allocatable, dimension(:,:) :: cp,cr,cp2,cr2,cpr
 
@@ -403,14 +403,14 @@
 
 ! --- allocate arrays for all cores 
 
-        allocate(wp(ntraj_proc),cpr(ndim+1,2*ndim), s2p(ndim,4))
+        allocate(wp(ntraj_proc),cpr(ndim+1,2*ndim), s2p(4,ndim))
 
-      allocate(fr_proc(ndim,ntraj_proc),du_proc(ndim,ntraj_proc),
+        allocate(fr_proc(ndim,ntraj_proc),du_proc(ndim,ntraj_proc),
      +         ap_proc(ndim,ntraj_proc),x_proc(ndim,ntraj_proc),
      +         p_proc(ndim,ntraj_proc),rp_proc(ndim,ntraj_proc),
-     +         arp(ndim,ntraj_proc))
+     +         ar_proc(ndim,ntraj_proc))
       
-      allocate(s1p(ndim+1,ndim+1),cpp(ndim+1,ndim),crp(ndim+1,ndim),
+        allocate(s1p(ndim+1,ndim+1),cpp(ndim+1,ndim),crp(ndim+1,ndim),
      +         cp2(4,ndim),cr2(4,ndim),cp(ndim+1,ndim),cr(ndim+1,ndim))
 
 ! --- initial parameters 
@@ -428,6 +428,8 @@
       enddo
 
       if(myid == root) then
+        s2p = 0d0
+        s2_sum = 0d0
 
         w = 1d0/dble(ntraj)
 
@@ -591,22 +593,22 @@
         
         time = mpi_wtime()
 
-        call aver(ndim,ntraj_proc,ntraj,x_proc,cp,cr,ap_proc,arp)
+        call aver(ndim,ntraj_proc,ntraj,x_proc,cp,cr,ap_proc,ar_proc)
 
 ! ----- collect approximated {ap,ar}
       
-        call MPI_GATHER(ap_proc,ndim*ntraj_proc,mpi_double_precision,ap,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
-
-        call MPI_GATHER(arp,ndim*ntraj_proc,mpi_double_precision,ar,
-     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
-     +                  MPI_COMM_WORLD,ierr)
-
+!        call MPI_GATHER(ap_proc,ndim*ntraj_proc,mpi_double_precision,ap,
+!     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+!     +                  MPI_COMM_WORLD,ierr)
+!
+!        call MPI_GATHER(ar_proc,ndim*ntraj_proc,mpi_double_precision,ar,
+!     +                  ndim*ntraj_proc,mpi_double_precision,ROOT,
+!     +                  MPI_COMM_WORLD,ierr)
+!
 ! ---- compute averages of f*f, f= (1,x,x^2,x^3)
 
-        call  aver_proc(ndim,ntraj_proc,wp,cp,cr,s2p,x_proc,p_proc,
-     +                  rp_proc, ap_proc,arp) 
+        call  aver_proc(ndim,ntraj_proc,wp,cp2,cr2,s2p,x_proc,p_proc,
+     +                  rp_proc,ap_proc,ar_proc) 
 
         call mpi_reduce(cp2,cp2_sum,ndim*4,
      +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
@@ -622,6 +624,8 @@
         if(myid == root) then
 
           time = mpi_wtime()-time
+          
+          write(*,*) 's2 on root',(s2_sum(i,1),i=1,16)
 
           write(*,6689) time
 

@@ -144,32 +144,32 @@
 ! --- collect averages for second-step fitting
 !     for every processor 
 
-      subroutine aver_proc(ndim,ntraj_proc,wp,cp,cr,s2p,x_proc,p_proc,r_proc, & 
+      subroutine aver_proc(ndim,ntraj_proc,wp,cp2_proc,cr2_proc,s2p,x_proc,p_proc,rp_proc, & 
                            ap_proc,ar_proc) 
       
       implicit real*8(a-h, o-z)
 
-      real*8 :: cp(4,ndim),cr(4,ndim),f(4),s2p(16,ndim),wp(ntraj_proc)
+      real*8 :: cp2_proc(4,ndim),cr2_proc(4,ndim),f(4),s2p(16,ndim),wp(ntraj_proc)
 
       real*8 :: ap_proc(ndim,ntraj_proc), ar_proc(ndim,ntraj_proc), & 
                 x_proc(ndim,ntraj_proc), p_proc(ndim,ntraj_proc), & 
-                r_proc(ndim,ntraj_proc)
+                rp_proc(ndim,ntraj_proc)
 
+      cp = 0d0
+      cr = 0d0 
+      s2p = 0d0
+ 
       dimloop:do j=1,ndim
-        
-        cp = 0d0
-        cr = 0d0 
-        s2p = 0d0 
 
         do i=1,ntraj_proc
           f = (/x_proc(j,i),x_proc(j,i)**2,x_proc(j,i)**3,1d0/)
           do k=1,4
-            cp(k,j) = cp(k,j)+(p_proc(j,i)-ap_proc(j,i))*f(k)*wp(i)
-            cr(k,j) = cr(k,j)+(r_proc(j,i)-ar_proc(j,i))*f(k)*wp(i)
+            cp2_proc(k,j) = cp2_proc(k,j)+(p_proc(j,i)-ap_proc(j,i))*f(k)*wp(i)
+            cr2_proc(k,j) = cr2_proc(k,j)+(rp_proc(j,i)-ar_proc(j,i))*f(k)*wp(i)
           enddo
 
 ! ------- would use the symmetry of s2p to reduce the length of
-!         s2p(ndim,nb**2) to (ndim,np!), now just use 4**2
+!         s2p(ndim,nb**2) to (ndim,np**2/2), now just use 4**2
 
           do m=1,4
             do n=1,4
@@ -245,10 +245,17 @@
 !            s2(n,m) = s2(m,n) 
 !          enddo
 !        enddo
+
+       write(*,*) 's2 = ' 
+       do l=1,4
+         write(*,*) (s2(k,l),k=1,4)
+       enddo 
         
         call dposv('U',4,2,s2,4,cpr,4,info)
+
         if(info/=0) then
-          write(*,*) 'cubic fitting of r failed.'
+          write(*,*) 8899
+8899      format('cubic fitting of r failed')
           stop
         endif
 
