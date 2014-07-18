@@ -149,14 +149,16 @@
       
       implicit real*8(a-h, o-z)
 
-      real*8 :: cp2_proc(4,ndim),cr2_proc(4,ndim),f(4),s2p(16,ndim),wp(ntraj_proc)
+      real*8 :: cp2_proc(4,ndim),cr2_proc(4,ndim),f(4),wp(ntraj_proc)
 
       real*8 :: ap_proc(ndim,ntraj_proc), ar_proc(ndim,ntraj_proc), & 
                 x_proc(ndim,ntraj_proc), p_proc(ndim,ntraj_proc), & 
                 rp_proc(ndim,ntraj_proc)
 
-      cp = 0d0
-      cr = 0d0 
+      real*8, intent(out) :: s2p(16,ndim)
+
+      cp2_proc = 0d0
+      cr2_proc = 0d0 
       s2p = 0d0
  
       dimloop:do j=1,ndim
@@ -191,18 +193,12 @@
       
       implicit real*8(a-h,o-z)
 
-      real*8 :: f2(4), &
-             s2_sum(16,ndim),cpr(4,2),w(ntraj), & 
-             f(16), s2(4,4)
+      real*8 :: f2(4),s2_sum(16,ndim),cpr(4,2),w(ntraj),s2(4,4)
              
       real*8, intent(inout) :: cp2(4,ndim),cr2(4,ndim)
 
       dimloop:do j=1,ndim
         
-        do i=1,16 
-          f(i) = s2_sum(i,j)
-        enddo 
-
         do m=1,4
           do n=1,4
             l = 4*(m-1)+n

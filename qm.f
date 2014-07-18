@@ -33,9 +33,9 @@
 
       real*8, allocatable, dimension(:,:) :: ap_proc,du_proc,fr_proc,
      +                                       x_proc,p_proc,rp_proc,
-     +       s1,cpp,crp,s1p,ar_proc,cp2,cr2,s2p, cp2_sum,cr2_sum, s2_sum
+     +       s1,cpp,crp,s1p,ar_proc,s2p, cp2,cr2, s2_sum
 
-      real*8, allocatable, dimension(:,:) :: cp,cr,cp2,cr2,cpr
+      real*8, allocatable, dimension(:,:) :: cp,cr,cp2_proc,cr2_proc,cpr
 
       real*8 :: gasdev
 
@@ -397,13 +397,14 @@
 
         allocate(s1(ndim+1,ndim+1),pe(ntraj),ke(ntraj),x(ndim,ntraj), 
      +           p(ndim,ntraj),ap(ndim,ntraj),ar(ndim,ntraj),
-     +           rp(ndim,ntraj),w(ntraj),s2_sum(16,ndim),
-     +           cp2_sum(4,ndim),cr2_sum(4,ndim))
+     +           rp(ndim,ntraj),w(ntraj),s2_sum(16,ndim))
       endif
 
 ! --- allocate arrays for all cores 
 
-        allocate(wp(ntraj_proc),cpr(ndim+1,2*ndim), s2p(4,ndim))
+        allocate(cp2(4,ndim),cr2(4,ndim))
+
+        allocate(wp(ntraj_proc),cpr(ndim+1,2*ndim), s2p(16,ndim))
 
         allocate(fr_proc(ndim,ntraj_proc),du_proc(ndim,ntraj_proc),
      +         ap_proc(ndim,ntraj_proc),x_proc(ndim,ntraj_proc),
@@ -411,7 +412,8 @@
      +         ar_proc(ndim,ntraj_proc))
       
         allocate(s1p(ndim+1,ndim+1),cpp(ndim+1,ndim),crp(ndim+1,ndim),
-     +         cp2(4,ndim),cr2(4,ndim),cp(ndim+1,ndim),cr(ndim+1,ndim))
+     +         cp2_proc(4,ndim),cr2_proc(4,ndim),
+     +         cp(ndim+1,ndim),cr(ndim+1,ndim))
 
 ! --- initial parameters 
       
@@ -534,12 +536,17 @@
 !       call mpi_bcast(cf,ndim,mpi_double_precision,root,
 !     +               mpi_comm_world,ierr)
 
-      if(myid == root) then 
+      if(myid == root) then
+
         time = mpi_wtime() - time
+
         write(*,6678) time
+
 6678    format('Scatter work finished. Time for initial scattering',
      +         f12.6/)
+        
         write(*,6679) 
+
 6679    format('Now propagate quantum trajectories...')
       endif
 
@@ -574,9 +581,13 @@
 6688       format('time to collect matrix elements',f12.6/)
 
           time = mpi_wtime()
+
           call fit(ntraj,ndim,cp,cr,s1,am,w)
+
           time = mpi_wtime()-time
+
           write(*,6680) time
+
 6680      format('time for linear fit at root', f12.6/)
         endif
 
@@ -607,16 +618,19 @@
 !
 ! ---- compute averages of f*f, f= (1,x,x^2,x^3)
 
-        call  aver_proc(ndim,ntraj_proc,wp,cp2,cr2,s2p,x_proc,p_proc,
-     +                  rp_proc,ap_proc,ar_proc) 
+        call  aver_proc(ndim,ntraj_proc,wp,cp2_proc,cr2_proc,s2p,
+     +                  x_proc,p_proc,rp_proc,
+     +                  ap_proc,ar_proc) 
 
-        call mpi_reduce(cp2,cp2_sum,ndim*4,
+        call mpi_barrier(mpi_comm_world,ierr)
+        
+        call mpi_reduce(cp2_proc,cp2,4*ndim,
      +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
 
-        call mpi_reduce(cr2,cr2_sum,ndim*4,
+        call mpi_reduce(cr2_proc,cr2,4*ndim,
      +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
 
-        call mpi_reduce(s2p,s2_sum,ndim*16,
+        call mpi_reduce(s2p,s2_sum,16*ndim,
      +       MPI_DOUBLE_PRECISION,mpi_sum,root,MPI_COMM_WORLD,ierr)
 
 ! ----  do second fitting, root
@@ -644,13 +658,17 @@
 
         endif
 
-        call MPI_BARRIER(mpi_comm_world,ierr)
+!        call MPI_BARRIER(mpi_comm_world,ierr)
 
         call mpi_bcast(cp2,ndim*4,mpi_double_precision,root,
      +                   mpi_comm_world,ierr)
 
         call mpi_bcast(cr2,ndim*4,mpi_double_precision,root,
      +                   mpi_comm_world,ierr)
+
+        call mpi_barrier(mpi_comm_world,ierr)
+
+        if(rank == 0) write(*,*) 'checkpoint, bcast finished'
 
         call comp(am,wp,ntraj_proc,ndim,eup,cp,cr,cp2,cr2,
      +            x_proc,ap_proc,du_proc,fr_proc)
