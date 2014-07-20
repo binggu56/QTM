@@ -529,7 +529,7 @@
      +                 rp_proc,ndim*ntraj_proc,mpi_double_precision,
      +                 root,mpi_comm_world,ierr)
 
-      call MPI_SCATTER(w,ntraj_proc,mpi_double_precision,
+      call mpi_scatter(w,ntraj_proc,mpi_double_precision,
      +                 wp,ntraj_proc,mpi_double_precision,
      +                 root,mpi_comm_world,ierr)
 
@@ -1028,11 +1028,11 @@
           
 !        enddo
 
-!-------update potential, kinetic, and total energy each proc
+! --- update potential, kinetic, and total energy each proc
       enk_proc = 0d0 
-      do i=1,Ntraj_proc 
+      do i=1,ntraj_proc 
         do j=1,ndim
-          enk_proc = enk_proc+p_proc(j,i)**2/(2d0*am(j))
+          enk_proc = enk_proc + p_proc(j,i)**2/(2d0*am(j))*wp(i)
         enddo 
       enddo 
       
