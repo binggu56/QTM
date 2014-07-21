@@ -133,8 +133,8 @@
 
       Ndim = NATOM3
 
-!      den = 5.231d-3
-      den = 4.61421d-3 ! Hinde 
+      den = 5.231d-3
+!      den = 4.61421d-3 ! Hinde 
 
 ! --- num of trajectories ppn 
       ntraj_proc = ntraj/numprocs
@@ -668,7 +668,7 @@
 
         call mpi_barrier(mpi_comm_world,ierr)
 
-        if(rank == 0) write(*,*) 'checkpoint, bcast finished'
+!        if(rank == 0) write(*,*) 'checkpoint, bcast finished'
 
         call comp(am,wp,ntraj_proc,ndim,eup,cp,cr,cp2,cr2,
      +            x_proc,ap_proc,du_proc,fr_proc)
