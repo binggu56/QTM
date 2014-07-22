@@ -1,0 +1,140 @@
+\documentclass[11pt]{minimal}
+
+\usepackage{tikz}
+\usepackage{pgf}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{times}
+%\usepackage{fontspec,xltxtra,xunicode}
+%\defaultfontfeatures{Mapping=tex-text}
+%\setromanfont[Mapping=tex-text]{Hoefler Text} % Main document font
+%\setsansfont[Scale=MatchLowercase,Mapping=tex-text]{Gill Sans} % Font for your name at the top
+%\setmonofont[Scale=MatchLowercase]{Andale Mono}
+%\usetikzlibrary{shapes,arrows,calc}
+\usetikzlibrary{calc,trees,positioning,arrows,chains,shapes.geometric,%
+    decorations.pathreplacing,decorations.pathmorphing,shapes,%
+    matrix,shapes.symbols}
+%%%<
+\usepackage{verbatim}
+\usepackage{bm}
+\usepackage{mystyle}
+
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+%\setlength\PreviewBorder{10pt}%
+%%%>
+
+\begin{comment}
+:Title: Simple flow chart
+:Tags: Diagrams
+
+With PGF/TikZ you can draw flow charts with relative ease. This flow chart from [1]_
+outlines an algorithm for identifying the parameters of an autonomous underwater vehicle model. 
+
+Note that relative node
+placement has been used to avoid placing nodes explicitly. This feature was
+introduced in PGF/TikZ >= 1.09.
+
+.. [1] Bossley, K.; Brown, M. & Harris, C. Neurofuzzy identification of an autonomous underwater vehicle `International Journal of Systems Science`, 1999, 30, 901-913 
+\end{comment}
+
+
+\begin{document}
+%\pagestyle{empty}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    	block/.style={rectangle, fill=brown!10,rounded corners, draw=black, very thick, text width=4cm, minimum height=3em, text centered},
+    	block_left/.style={rectangle, fill=brown!10,rounded corners, draw=black, very thick, text width=4cm, minimum height=2em},
+        root/.style={rectangle, fill=brown!10,rounded corners, draw=black, very thick, text width=4cm, minimum height=2em},
+	base/.style={draw, on chain, on grid, align=center, minimum height=4ex},
+    % Define arrow style
+	pil/.style={->, thick, shorten <=2pt, shorten >=2pt},
+   	 decision/.style={diamond,fill=blue!20,
+%	draw=thick, 
+	text width = 2cm,
+	text badly centered,
+	node distance=2.5cm,
+	inner sep=2pt,
+	rounded corners},
+	cloud/.style={ ellipse, fill=pink!10, draw=black, very thick, node distance=6cm, text width = 3cm, text centered,
+         minimum height=1.2cm},       
+    	line/.style={draw, very thick, -latex'},
+	it/.style={}
+}
+
+% Define block styles
+%\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+%    text width=6em, minimum height = 2em,
+%    text badly centered, node distance=3cm, inner sep=0pt]
+%\tikzstyle{block} = [rectangle, draw=black, fill=white, %blue!20, 
+%    text width=5em, text centered, rounded corners, minimum height=4em]
+%\tikzstyle{line} = [draw, -latex']
+%\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+%    minimum height=2em]
+    
+\begin{tikzpicture}[
+	node distance = 2.cm and 4cm, auto
+]
+    % Place nodes
+    	\node [block, fill = green!10] (init) {Initialize sampling of quantum trajectories, $\bm x,\bm p,\bm r$};
+	\node[block,fill = green!10, below of = init, node distance=1.6cm](dist){Distribute quantum trajectories to slave processors};
+	\node[block,fill = green!10, below of = dist, node distance = 1.5cm](proc1){traj[$1..N$]};
+	\node[block, right of = proc1, node distance = 4.5cm](proc2){traj[$N+1..2N$], $\cdots$ };
+	\node[block, right of = proc2, node distance= 4.5cm](procn){traj[$N_{traj}-N+1..N_{traj}$]};
+			
+        \node [block,fill = green!10, below of=proc1, node distance = 1.5cm] (collect) {Collect averages  over trajectories $\bra x_i \ket, \bra x_ix_j \ket, \cdots $ };
+
+	\node [block_left, fill = green!10, below of=collect](matrix){Call LAPACK to solve $\textbf{A}\bm x=\bm b$, update $U(\bm x,t), \partial_i U(\bm x,t)$};
+        \node [block_left, fill = green!10, below of=matrix, text width = 4cm] (fit) {Distribute quantum force to slave processors};
+%    \node [cloud, left of=init] (expert) {Coordinates of Nuclei};
+   	\node [block_left,fill = green!10, below of=fit] (prop1) {1. Compute classical force\\ 2. Propagate trajectories by $\delta t$};
+        \node [block_left, right of=prop1, node distance = 4.5cm] (prop2) {1. Compute classical force\\ 2. Propagate trajectories by $\delta t$};
+        \node [block_left, right of=prop2,node distance = 4.5cm] (propn) {1. Compute classical force\\ 2. Propagate trajectories by $\delta t$};
+
+
+%    \node [block,below of=evaluate](ksorb){Calculate New Electron Density $n(\bm r)$ and Total Energy };
+%    \node [block, left of=evaluate, node distance=5.5cm] (update) {update density};
+    \node [decision, below of=prop1, node distance=3cm] (decide) {Final time?};
+    \node [decision, fill= red, right of=decide, node distance = 3.5cm](stop){STOP};
+     \node [it, above=0mm of init](rank0) {\textbf{ROOT} (RANK 0)};
+     \node [it, right of = rank0, node distance=4.5cm](rank1) {RANK 1..$N_p$-1};
+    \node [it, right of = rank1, node distance=4.5cm]{RANK $N_p$};
+     
+%    \node [block, below of=decide, node distance=2.5cm] (stop) {Output Quantities};
+% A couple of boxes have annotations
+%    \node [it, above=0mm of add] {(The main problem in DFT)};
+
+    % Draw edges
+
+%    \path [line] (evaluate) -- (ksorb);
+%    \path [line](ksorb)--(decide);
+%    \path [line] (decide) -| node [near start] {no} (update);
+%    \path [line] (update) |- ($(init)!.5!(identify)$);
+  \path [line] (init) -- (dist);
+  \path [line] (dist) -- (proc1);
+   \path [line] (dist) -| (proc2);
+    \path [line] (dist) -| (procn);
+    \path [line] (proc1) -- (collect);
+    \path [line] (collect) -- (matrix);
+    \path [line] (matrix) -- (fit);
+    \path [line] (fit) -| (prop2);
+    \path [line] (fit) -| (propn);
+    \path [line] (fit) -- (prop1);
+    \path [line] (proc2) |- (collect);
+        \path [line] (procn) |- (collect);
+        \path [line] (prop1) -- (decide);
+        \path[line]  (decide) edge[bend left=90]  node[near start]{no} (collect);
+        \path [line] (decide) -- node {yes}(stop);
+%    \path [line,dashed] (expert) -- (init);
+%    \path [line,dashed](add)|- (identify);
+%    \path [line,dashed] (system) -- (init);
+%    \path [line,dashed] (system) |- (evaluate);
+%	\path [line, red] (decide) |- ($(init)!.5!(identify)$);
+
+\end{tikzpicture}
+
+\end{document}

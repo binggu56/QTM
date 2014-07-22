@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  16 APR 2014 14:39
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  15 JUL 2014 15:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -312,144 +312,124 @@ File: ucsencs.def 2011/01/21 Fixes to fontencodings LGR, T3
 
 Class revtex4 Warning: Assuming \noaffiliation for Bing Gu.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 22.
+LaTeX Font Info:    Try loading font information for U+msa on input line 24.
 (/usr/local/texlive/2012/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 22.
+LaTeX Font Info:    Try loading font information for U+msb on input line 24.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 ) [1{/usr/local/texlive/2012/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 
-LaTeX Warning: Reference `sophya2011' on page 2 undefined on input line 34.
+LaTeX Warning: Reference `sophya2011' on page 2 undefined on input line 39.
 
 
 Package natbib Warning: Citation `garashchuk2004' on page 2 undefined on input 
-line 44.
+line 49.
 
 
-Package natbib Warning: Citation `nurec2' on page 2 undefined on input line 47.
+Package natbib Warning: Citation `garashchuk2004' on page 2 undefined on input 
+line 51.
+
+
+Package natbib Warning: Citation `nurec2' on page 2 undefined on input line 54.
 
 
 [2]
 
-Package natbib Warning: Citation `goldfarb2006' on page 3 undefined on input li
-ne 75.
-
-
-Package natbib Warning: Citation `wyatt2000' on page 3 undefined on input line 
-75.
-
-
-Package natbib Warning: Citation `gindensperger2000' on page 3 undefined on inp
-ut line 75.
-
-
-Package natbib Warning: Citation `kendrick2003' on page 3 undefined on input li
-ne 75.
-
-
-Package natbib Warning: Citation `lopreore1999' on page 3 undefined on input li
-ne 75.
-
-
-Package natbib Warning: Citation `trahan2003' on page 3 undefined on input line
- 75.
-
-
 Package natbib Warning: Citation `garashchuk_rcc' on page 3 undefined on input 
-line 77.
+line 83.
 
-[3] [4] [5]
-</Users/bing/Labwork/friction/rp2/energy.pdf, id=33, 578.16pt x 433.62pt>
-File: /Users/bing/Labwork/friction/rp2/energy.pdf Graphic file (type pdf)
+Package epstopdf Info: Source file: <figs/traj.eps>
+(epstopdf)                    date: 2014-07-15 11:28:01
+(epstopdf)                    size: 66737 bytes
+(epstopdf)             Output file: <figs/traj-eps-converted-to.pdf>
+(epstopdf)                    date: 2014-07-15 11:28:01
+(epstopdf)                    size: 26738 bytes
+(epstopdf)             Command: <repstopdf --outfile=figs/traj-eps-converted-to
+.pdf figs/traj.eps>
+(epstopdf)             \includegraphics on input line 90.
+Package epstopdf Info: Output file is already uptodate.
+<figs/traj-eps-converted-to.pdf, id=20, 686.565pt x 492.84125pt>
+File: figs/traj-eps-converted-to.pdf Graphic file (type pdf)
 
-<use /Users/bing/Labwork/friction/rp2/energy.pdf>
-Package pdftex.def Info: /Users/bing/Labwork/friction/rp2/energy.pdf used on in
-put line 168.
-(pdftex.def)             Requested size: 468.0pt x 350.9987pt.
+<use figs/traj-eps-converted-to.pdf>
+Package pdftex.def Info: figs/traj-eps-converted-to.pdf used on input line 90.
+(pdftex.def)             Requested size: 374.40143pt x 268.75482pt.
+ [3] [4 <./figs/traj-eps-converted-to.pdf>] [5]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 200.
 
-</Users/bing/Labwork/friction/rp2/traj.pdf, id=34, 578.16pt x 433.62pt>
-File: /Users/bing/Labwork/friction/rp2/traj.pdf Graphic file (type pdf)
-
-<use /Users/bing/Labwork/friction/rp2/traj.pdf>
-Package pdftex.def Info: /Users/bing/Labwork/friction/rp2/traj.pdf used on inpu
-t line 176.
-(pdftex.def)             Requested size: 468.0pt x 350.9987pt.
- [6] [7 </Users/bing/Labwork/friction/rp2/energy.pdf>]
-</Users/bing/Labwork/friction/2d8/energy.pdf, id=80, 578.16pt x 433.62pt>
+ (/usr/local/texlive/2012/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 200.
+ [6]
+</Users/bing/Labwork/friction/2d8/energy.pdf, id=44, 578.16pt x 433.62pt>
 File: /Users/bing/Labwork/friction/2d8/energy.pdf Graphic file (type pdf)
 
 <use /Users/bing/Labwork/friction/2d8/energy.pdf>
 Package pdftex.def Info: /Users/bing/Labwork/friction/2d8/energy.pdf used on in
-put line 201.
-(pdftex.def)             Requested size: 468.0pt x 350.9987pt.
+put line 214.
+(pdftex.def)             Requested size: 374.40143pt x 280.79764pt.
 
 
-Package natbib Warning: Citation `fig:scale' on page 8 undefined on input line 
-214.
+Package natbib Warning: Citation `fig:scale' on page 7 undefined on input line 
+227.
 
-! Undefined control sequence.
-l.215 \textcolor
-                [red]{Polynomial time algorithm must diverge at certain situ...
+<flowchart/qtm_mpi.pdf, id=45, 479.59174pt x 455.46161pt>
+File: flowchart/qtm_mpi.pdf Graphic file (type pdf)
 
-? 
+<use flowchart/qtm_mpi.pdf>
+Package pdftex.def Info: flowchart/qtm_mpi.pdf used on input line 229.
+(pdftex.def)             Requested size: 374.40143pt x 355.5783pt.
+ [7 </Users/bing/Labwork/friction/2d8/energy.pdf>]
+[8 <./flowchart/qtm_mpi.pdf>] [9]
 
 Package natbib Warning: There were undefined citations.
 
-
-! LaTeX Error: \begin{itemize} on input line 185 ended by \end{document}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.222 \end{document}
-                    
-? 
-[8 </Users/bing/Labwork/friction/rp2/traj.pdf>] [9 </Users/bing/Labwork/frictio
-n/2d8/energy.pdf>] (./friction.aux)
+[10] (./friction.aux)
 
 LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
- )
-(\end occurred inside a group at level 1)
-
-### semi simple group (level 1) entered at line 185 (\begingroup)
-### bottom level 
+ ) 
 Here is how much of TeX's memory you used:
- 4347 strings out of 493488
- 58185 string characters out of 3141326
- 140303 words of memory out of 3000000
- 7570 multiletter control sequences out of 15000+200000
+ 4375 strings out of 493488
+ 58340 string characters out of 3141326
+ 141303 words of memory out of 3000000
+ 7580 multiletter control sequences out of 15000+200000
  16811 words of font info for 62 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 42i,14n,25p,1019b,375s stack positions out of 5000i,500n,10000p,200000b,50000s
-</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmbsy10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmbx10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmbx12.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmex10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm
-/cmmi10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmmi6.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-mi8.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi
-b10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cmextra
-/cmmib8.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmr10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-r6.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.
-pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.p
-fb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb
-></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.
-pfb>
-Output written on friction.pdf (9 pages, 216122 bytes).
+ 42i,11n,24p,1019b,303s stack positions out of 5000i,500n,10000p,200000b,50000s
+</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pf
+b></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
+></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
+</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
+/usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></us
+r/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/
+local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/lo
+cal/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/lo
+cal/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></us
+r/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/
+local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/loc
+al/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/
+texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/tex
+live/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texliv
+e/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive
+/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2
+012/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/20
+12/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texliv
+e/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2012/tex
+mf-dist/fonts/type1/urw/times/utmr8a.pfb>
+Output written on friction.pdf (10 pages, 436175 bytes).
 PDF statistics:
- 208 PDF objects out of 1000 (max. 8388607)
- 88 compressed objects within 1 object stream
+ 193 PDF objects out of 1000 (max. 8388607)
+ 122 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
