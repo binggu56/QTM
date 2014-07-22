@@ -1,0 +1,5 @@
+2000         # number of trajectories
+1            # number of dimensions
+2000,0.005d0   # time steps
+1d0 	     # mass
+2	     # iqp

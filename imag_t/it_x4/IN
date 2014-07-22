@@ -1,0 +1,8 @@
+3000         # number of trajectories
+1            # number of dimensions
+3000,0.005d0      # time steps
+1d0 	     # mass
+0d0	     # center of initial wavepacket
+1d0	      # wavepacket width
+1	     # ipot (1 h.o. 2 morse 3 cubic)  
+1		# iqp (1 linear 2 quadratic)

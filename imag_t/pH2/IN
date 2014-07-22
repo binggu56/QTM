@@ -1,0 +1,4 @@
+1000         # number of trajectories
+6            # number of dimensions
+3000,4d0     # time steps
+2	     # iqp (1 linear 2 quadratic)

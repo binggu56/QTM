@@ -1,0 +1,9 @@
+#
+
+set term wxt
+plot "xoutput" u 1:2 title "x" w l 
+
+set term postscript
+set output "x.ps"
+
+replot
