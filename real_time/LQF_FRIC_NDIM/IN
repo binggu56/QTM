@@ -1,0 +1,6 @@
+2000        # number of trajectories
+2            # number fo dimensions
+6000,0.08     # time steps
+5,12,13         # idum1 & idum2
+0.5d0,0.5d0,0.5d0      # constants for wavefunction 
+1d0,1d0,1d0      # mass

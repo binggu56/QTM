@@ -1,0 +1,11 @@
+10000        # number of trajectories
+1000,0.001d0 # time steps
+1d0,1d0     # mass
+50,120      # idum1 & idum2
+6d0,0.5d0   # constants for initial wavefunction
+1.4d0,0d0   # center for the wavepacket
+0d0,0d0     # initial momentum
+0d0         # lambda,coefficient for x-y/2*gamma
+3           # ipot 3-Morse 4-Henon
+
+

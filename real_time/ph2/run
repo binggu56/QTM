@@ -1,0 +1,10 @@
+#!/bin/bash
+if [ -e $1 ]
+  then
+    rm -r $1
+fi
+
+mkdir $1
+cp qm IN qm.f  $1
+cd $1
+time ./qm &

@@ -1,0 +1,13 @@
+
+
+set term wxt
+plot "xoutput" u 1:4 title "traj1" with lines lw 2, \
+     "xoutput" u 1:8 title "traj2" with lines lw 2, \
+     "xoutput" u 1:12 title "traj3" with lines lw 2
+
+set term postscript
+set output "traj.ps"
+
+replot
+
+

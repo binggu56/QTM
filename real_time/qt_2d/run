@@ -1,0 +1,3 @@
+rm quantum.x
+make quantum.x
+./quantum.x

@@ -1,0 +1,4 @@
+3000         # number of trajectories
+12            # number fo dimensions
+3000,10         # time steps
+0.02509d0     # unit cell distance

@@ -1,0 +1,15 @@
+#number of trajectories
+100
+#number of dimensions
+2
+#total time steps and time step
+10000,0.01
+#constants for potential energy
+1,2
+#mass
+10,1
+
+
+
+
+

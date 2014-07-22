@@ -1,0 +1,3 @@
+1000        # number of trajectories
+36            # number fo dimensions
+20000,10     # time steps
