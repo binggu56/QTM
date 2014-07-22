@@ -1,0 +1,70 @@
+\documentclass[11pt]{revtex4}
+\usepackage[utf8x]{inputenc}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{mystyle}
+\usepackage{amsmath}
+\usepackage{bm}
+
+\begin{document}
+
+\title{Pair distribution function}
+\author{Bing Gu}
+
+\begin{abstract}
+
+\end{abstract}
+
+\maketitle
+\section{Radial distribution function}
+To have a theoretical measure of the inter-atom distance distribution at ground state for atomic solids accounting for quantum effects, it seems appropriate to define a radial distribution function 
+\begin{align}
+ g(r) & = \frac{1}{4\pi \rho N r^2}\frac{\bra \psi_0(\bm r_1, \cdots, \bm r_N)  | \sum_{i,j \neq i}^N \delta(r - |r_{ij}|) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket}{\bra \psi_0(\bm r_1, \cdots, \bm r_N ) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket} \\ 
+	& =   \frac{1}{4\pi \rho N r^2}\sum_{i,j < i}^N \frac{\bra \psi_0(\bm r_1, \cdots, \bm r_N)  | \delta(r - |r_{ij}|) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket}{\bra \psi_0(\bm r_1, \cdots, \bm r_N ) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket}
+\end{align}
+for wavefunction with exchange symmetry, i.e. particles are indistinguishable 
+\begin{align}
+ g(r) & = \frac{N}{\rho}\frac{\bra \delta(r - |r_{12}|) \ket}{4\pi r^2}  \\ 
+% \frac{\bra \psi_0(\bm r_1, \cdots, \bm r_N)  | \delta(r - |r_{12}|) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket}{\bra \psi_0(\bm r_1, \cdots, \bm r_N ) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket} \\  
+	&  = \frac{N}{4\pi \rho r^2} \int d\bm r_1 d\bm r_2 \delta(r - |\bm r_{12}|)\rho(\bm r_1,\bm r_2) 
+\end{align}
+where $\rho(\bm r_1, \bm r_2)$ is the joint probability. 
+\be \rho(\bm r_1, \bm r_2) = \int d\bm r_3\cdots d\bm r_N~ \rho(\bm r_1,\cdots,\bm r_N) \ee 
+We would like to see if the form would give right solution at two limiting cases. 
+
+The first limiting case is a perfect solid, every atom has a fixed position in space, $\bm R_i$.
+\be g(r) = \sum_{i,j \neq i} \delta(r-|\bm R_{ij}|) \ee 
+the pair distribution function will be peaks at all the possible distance, which is what we expect to see. 
+
+Another case is non-interacting limit and the ground state density can be approximated with a uniform distribution $\rho(\bm r_1, \bm r_2) = (\frac{1}{V})^2$, the system should behave like ideal gas.  
+The PDF will be  
+\begin{flalign}  
+g(r) & = \frac{N}{\rho}  (\frac{1}{V})^2 \int d\bm r_1 d\bm r_2 \frac{\delta(r - | \bm r_{12}|)}{4\pi r^2} \\ 
+ 	& = \frac{N}{\rho V} \\ 
+	& = 1 ~( ideal~gas) \\   
+\end{flalign}
+
+System in reality should be in the intermediate of this two limiting cases, for small vibrations in the equilibrium position ($|\delta \bm r| << |\bm r|$), a spreading of the infinity peak is likely to show up.
+ 
+\section{for quantum trajectories }
+For numerical difficulty, a Gaussian function would be used to replace the $\delta$ function,  \be \delta(x) = \lim_{\alpha \rightarrow \infty} \sqrt{\frac{2\alpha}{\pi}} e^{-\alpha x^2} \ee 
+As the wavefunctions is represented by an ensemble of quantum trajectories and we ignore the exchange effects,  we would use Eq. (1)   
+\begin{flalign} 
+g(r) & =  \lim_{\sigma \rightarrow \infty} \sum_{\alpha,\beta}^N \bra e^{-\sigma (r-|\bm r_{\alpha \beta} |)^2} \ket  \\
+	& =    \lim_{\sigma \rightarrow \infty} \sum_{\alpha,\beta}^N \bra e^{-\sigma (r-|\bm r_{\alpha \beta} |)^2} \ket \\
+	& =  \lim_{\sigma \rightarrow \infty}  \sum_{\alpha,\beta}^{N_{atom}} \sum_i^{N_{traj}} w_i e^{-\sigma (r-|\bm r^i_{\alpha \beta} |)^2} \\ 
+ \end{flalign}
+We can choose a large enough $\sigma$, can compute a bunch of values for $r$.
+
+Also, we can define a range $(R_{min}, R_{max})$, cut it into $N$ pieces, and compute the integration for each interval  
+\begin{align}
+ \int_{R_j}^{R_{j+1}} dr g(r) & = \sum_{\alpha,\beta}^{N_{atom}} \bra \left (h(R_{j+1}-|\bm r_{\alpha \beta} |)-h(R_j-|\bm r_{\alpha \beta} |)\right) \ket \\
+& = \sum_{\alpha,\beta}^{N_{atom}} \sum_i^{N_{traj}} w_i \left (h(R_{j+1}-|\bm r^i_{\alpha \beta} |)-h(R_j-|\bm r^i_{\alpha \beta} |)\right) \\ 
+ \end{flalign}
+
+where $h(x)$ is Heaviside step function. 
+It is similar to draw a histogram for different intervals, by counting trajectories with $r_{ij}$ fitting that range. 
+
+
+\end{document}
