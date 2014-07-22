@@ -20,16 +20,18 @@
 \section{Radial distribution function}
 To have a theoretical measure of the inter-atom distance distribution at ground state for atomic solids accounting for quantum effects, define radial distribution function for quantum systems in analogy to the formula in statistic mechanics. 
  
-\be g(\bm r_1, \bm r_2) = \frac{N(N-1)}{\rho^2} \rho(\bm r_1, \bm r_2) \ee
+\be g(\bm r_1, \bm r_2) = \frac{N(N-1)}{\rho^2} \rho(\bm r_1, \bm r_2) \label{eq:rdf} \ee
  
 where $\rho = \frac{N}{V}$ is the single particle density and $\rho(\bm r_1, \bm r_2)$ is the joint probability. 
 \be \rho(\bm r_1, \bm r_2) = \int d\bm r_3\cdots d\bm r_N~ \rho(\bm r_1,\cdots,\bm r_N) \ee
 The one-dimensional radial distribution function can be obtained through averaging of the center of mass and polar angles $\theta$ and $\phi$.  
 
-\be g(r) = \int g(|r_{12}|)\delta(r-|r_{12}|)d|r_{12}| = g(\bm r_1, \bm r_2) = \frac{N(N-1)}{\rho^2} \rho(\bm r_1, \bm r_2) \ee 
+\be g(r) = \int g(|r_{12}|)\delta(r-|r_{12}|)d|r_{12}| \ee 
+% g(\bm r_1, \bm r_2) = \frac{N(N-1)}{\rho^2} \rho(\bm r_1, \bm r_2) \ee 
+Combining with Eq. (\ref(eq:rdf)), we obtain 
 \be g(|r_{12}|) = \frac{\int \int \int g(\bm r_1, \bm r_2) d(\frac{\bm r_1+\bm r_2}{2}) d\phi d\cos(\theta)}{\int d(\frac{\bm r_1+\bm r_2}{2}) \int d\phi \int d\cos(\theta)} \ee 
 
-Since the wavefunctions is represented by an ensemble of quantum trajectories, we want an expression that includes terms that can be computed with trajectories.  
+Since the wavefunctions is represented by an ensemble of quantum trajectories, it will be convinuent if we can transform the expression using terms that can be computed directly from trajectories.  
 %\begin{align} 
 % g(r) & = \frac{1}{4\pi \rho N r^2}\frac{\bra \psi_0(\bm r_1, \cdots, \bm r_N)  | \sum_{i,j \neq i}^N \delta(r - |r_{ij}|) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket}{\bra \psi_0(\bm r_1, \cdots, \bm r_N ) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket} \\ 
 %	& =   \frac{1}{4\pi \rho N r^2}\sum_{i,j < i}^N \frac{\bra \psi_0(\bm r_1, \cdots, \bm r_N)  | \delta(r - |r_{ij}|) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket}{\bra \psi_0(\bm r_1, \cdots, \bm r_N ) | \psi_0(\bm r_1, \cdots, \bm r_N) \ket}
@@ -56,16 +58,16 @@ Here $\bra \dots \ket$ represents quantum ensemble average.
 %System in reality should be in the intermediate of this two limiting cases, for small vibrations in the equilibrium position ($|\delta \bm r| << |\bm r|$), a spreading of the infinity peak is likely to show up.
  
 %\section{for quantum trajectories }
-For numerical difficulty, a Gaussian function would be used to replace the $\delta$ function,  \be \delta(x) = \lim_{\alpha \rightarrow \infty} \sqrt{\frac{2\alpha}{\pi}} e^{-\alpha x^2} \ee 
-As and we ignore the exchange effects,  we would use Eq. (1)   
-\begin{flalign} 
-g(r) & =  \lim_{\sigma \rightarrow \infty} \sum_{\alpha,\beta}^N \bra e^{-\sigma (r-|\bm r_{\alpha \beta} |)^2} \ket  \\
-	& =    \lim_{\sigma \rightarrow \infty} \sum_{\alpha,\beta}^N \bra e^{-\sigma (r-|\bm r_{\alpha \beta} |)^2} \ket \\
-	& =  \lim_{\sigma \rightarrow \infty}  \sum_{\alpha,\beta}^{N_{atom}} \sum_i^{N_{traj}} w_i e^{-\sigma (r-|\bm r^i_{\alpha \beta} |)^2} \\ 
- \end{flalign}
-We can choose a large enough $\sigma$, can compute a bunch of values for $r$.
+%For numerical difficulty, a Gaussian function would be used to replace the $\delta$ function,  \be \delta(x) = \lim_{\alpha \rightarrow \infty} \sqrt{\frac{2\alpha}{\pi}} e^{-\alpha x^2} \ee 
+%As and we ignore the exchange effects,  we would use Eq. (1)   
+%\begin{flalign} 
+%g(r) & =  \lim_{\sigma \rightarrow \infty} \sum_{\alpha,\beta}^N \bra e^{-\sigma (r-|\bm r_{\alpha \beta} |)^2} \ket  \\
+%	& =    \lim_{\sigma \rightarrow \infty} \sum_{\alpha,\beta}^N \bra e^{-\sigma (r-|\bm r_{\alpha \beta} |)^2} \ket \\
+%	& =  \lim_{\sigma \rightarrow \infty}  \sum_{\alpha,\beta}^{N_{atom}} \sum_i^{N_{traj}} w_i e^{-\sigma (r-|\bm r^i_{\alpha \beta} |)^2} \\ 
+% \end{flalign}
+%We can choose a large enough $\sigma$, can compute a bunch of values for $r$.
 
-Also, we can define a range $(R_{min}, R_{max})$, cut it into $N$ pieces, and compute the integration for each interval  
+For numerial reason, we can define a range $(R_{min}, R_{max})$ splitted into $N$ pieces, and compute the integration for each interval  
 \begin{align}
  \int_{R_j}^{R_{j+1}} dr g(r) & = \sum_{\alpha,\beta}^{N_{atom}} \bra \left (h(R_{j+1}-|\bm r_{\alpha \beta} |)-h(R_j-|\bm r_{\alpha \beta} |)\right) \ket \\
 & = \sum_{\alpha,\beta}^{N_{atom}} \sum_i^{N_{traj}} w_i \left (h(R_{j+1}-|\bm r^i_{\alpha \beta} |)-h(R_j-|\bm r^i_{\alpha \beta} |)\right) \\ 
