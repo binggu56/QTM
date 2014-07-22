@@ -242,11 +242,11 @@
 !          enddo
 !        enddo
 
-       write(*,*) 's2 = ' 
-       do l=1,4
-         write(*,*) (s2(k,l),k=1,4)
-       enddo 
-        
+!       write(*,*) 's2 = ' 
+!       do l=1,4
+!         write(*,*) (s2(k,l),k=1,4)
+!       enddo 
+!        
         call dposv('U',4,2,s2,4,cpr,4,info)
 
         if(info/=0) then
