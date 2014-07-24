@@ -1,5 +1,5 @@
-1200 # 19200             # number of trajectories
-1,3d0         # time steps
+19200             # number of trajectories
+10,3d0         # time steps
 8d0		          # mass in units of proton mass
 0.75d0            # initial guassian width
 40d0              # friction coeff
