@@ -23,7 +23,7 @@
 
       traj: do k=1,ntraj_proc
 
-        do j=1,ntraj_proc
+        do j=1,NATOM3
           q(j) = x_proc(j,k)
         enddo 
 

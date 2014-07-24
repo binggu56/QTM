@@ -39,6 +39,10 @@
 
       real*8 :: gasdev
 
+! --- arrays for pdf 
+
+      real*8, allocatable, dimension(:)   :: gr,p_gr 
+
 !------------------------------------------------------
       character*4 :: atom(NATOMS)
       real*8      :: am(NATOM3)
@@ -84,6 +88,7 @@
       read(10,*) a0
       read(10,*) cf0
       read(10,*) iread
+      read(10,*) NBIN_PDF
 
       close(10)
 
@@ -552,7 +557,14 @@
 
 ! --- bin for pair distribution function 
 
-      NBIN_PDF = 400 
+!      NBIN_PDF = 400 
+
+! --- allocate arrays for pdf 
+
+      if(rank == 0) allocate(gr(NBIN_PDF))
+
+      allocate(p_gr(NBIN_PDF))
+      
 
 ! --- trajectories propagation      
 
@@ -707,6 +719,17 @@
 ! ------- propagate trajectory in each proc for one time step
           call traj(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
      +            rp_proc,ap_proc,wp,du_proc,fr_proc,proc_po,enk_proc)
+
+
+! ------- if last step, compute pair distribution function 
+
+          if(kt == kmax) then 
+
+            call pdf(ndim,ntraj_proc,NBIN_PDF,wp,x_proc,p_gr)
+
+            call mpi_reduce(p_gr,gr,NBIN_PDF,MPI_DOUBLE_PRECISION,
+     +           mpi_sum,root,MPI_COMM_WORLD,ierr)
+          enddo 
 
 
 ! ----- set values to 0 to do mpi_reduce to get the full {x(ndim,ntraj),p,r} matrix
