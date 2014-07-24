@@ -550,8 +550,11 @@
 6679    format('Now propagate quantum trajectories...')
       endif
 
+! --- bin for pair distribution function 
 
-! --- trajectories propagation
+      NBIN_PDF = 400 
+
+! --- trajectories propagation      
 
       do 10 kt=1,kmax
 
