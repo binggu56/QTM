@@ -77,6 +77,7 @@
 
         open(11, file='en.dat',   status='new', action='write')
         open(12, file='traj.dat', status='new', action='write')
+        open(113,file='pdf.dat',  status='new', action='write')
 
 
 !---- read variables from IN
@@ -729,7 +730,7 @@
 
             call mpi_reduce(p_gr,gr,NBIN_PDF,MPI_DOUBLE_PRECISION,
      +           mpi_sum,root,MPI_COMM_WORLD,ierr)
-          enddo 
+          endif  
 
 
 ! ----- set values to 0 to do mpi_reduce to get the full {x(ndim,ntraj),p,r} matrix
@@ -774,7 +775,11 @@
           write(11,1000) t,enk,po,qu,tot
           call flush(11)
 
-          write(12,1000) t,(x(1,i),i=1,20),(p(1,i),i=1,20)
+          write(12,1000) t,(x(1,i),i=1,20),(p(1,i),i=1,20) 
+
+          do i=1,NBIN_PDF
+            write(113,1000) i*bin_pdf, gr(i)
+          enddo 
 
         endif
 

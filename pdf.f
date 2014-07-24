@@ -1,6 +1,6 @@
       subroutine pdf(ndim,ntraj_proc,NBIN_PDF,wp,x_proc,p_gr)
 
-      use cdat, only: pi
+      use cdat, only: pi, bin_pdf, binvrs_pdf
 
       implicit real*8(a-h, o-z)
 
@@ -16,8 +16,8 @@
 
       dimension q(NATOM3)
 
-      bin = 1d-2 
-      binvrs = 1d0/bin 
+!      bin_pdf = 1d-2 
+!      binvrs_pdf = 1d0/bin 
 
       p_gr = 0d0
 
@@ -40,9 +40,9 @@
           r = dsqrt(r2)
 
 !          ibin=int((r2-r2min)*binvrs)+1
-          ibin = int(r*binvrs)
+          ibin = int(r*binvrs_pdf)
 
-          if(ibin < NBIN_PDF) p_gr(ibin)=p_gr(ibin)+wp(k)/r**2            
+          if(ibin < NBIN_PDF) p_gr(ibin)=p_gr(ibin)+wp(k)/r2
                  
         end do
 
