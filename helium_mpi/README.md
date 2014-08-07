@@ -16,6 +16,11 @@ History:
 Ganrantee corrent version : 1.3.2, 1.4.0 (without long range)
 
 
+## 1.4.7 
+
+- optimize the code and put some subroutines into module 
+
+
 ############################################
 	1.4.4 
 ###################################
