@@ -16,9 +16,17 @@ History:
 Ganrantee corrent version : 1.3.2, 1.4.0 (without long range)
 
 
+## 1.4.8 
+
+- take advantage of modules of Fortran90 
+- put things which is not chaning after initilization into modules 
+
+
 ## 1.4.7 
 
-- optimize the code and put some subroutines into module 
+- optimize the code and put some subroutines into module
+- add subroutines to compute correction function 
+- instead of broadcast input variables, every processor reads input file 
 
 
 ############################################
