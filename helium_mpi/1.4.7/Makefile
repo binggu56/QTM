@@ -1,4 +1,4 @@
-objects = mod.o long_range.o reduce.o qm.o derivs.o input.o tstamp.o vinit.o gasdev.o ran1.o fit.o pdf.o
+objects = mod.o long_range.o reduce.o qm.o derivs.o input.o tstamp.o vinit.o gasdev.o ran1.o fit.o corr.o mativs.o
 #objects2 = long_range.o reduce.o cont.o derivs.o input.o tstamp.o vinit.o qpot.o gasdev.o ran2.o
 FC = mpif90
 #FC = ftn
