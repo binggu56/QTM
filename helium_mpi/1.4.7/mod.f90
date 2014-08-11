@@ -28,7 +28,9 @@
         end function trace  
 
 ! ----- average over trajectories y = sum(w(i)*x(i)) 
-        double precision function aver_traj(w,x)
+        double precision function aver_traj(ntraj,w,x)
+
+        integer*4, intent(in) :: Ntraj
         
         real*8 :: x(Ntraj),w(Ntraj)
 
@@ -39,19 +41,21 @@
         enddo
 
         end function aver_traj
+        
+! ----- random number seeds
+        subroutine seed(idum,Ndim)
+        
+        implicit real*8(a-h,o-z)
+        
+        integer*4, intent(in) :: Ndim
+        
+        integer*4, intent(out) :: idum(Ndim)
 
-        double precision function aver_proc(n,w,x)
+        do i=1,Ndim
+          idum(i) = 5 + i
+        enddo
 
-        integer*4 :: n,i
+        return
+        end subroutine
 
-        real*8    :: w(n),x(n)
-
-        aver_proc = 0d0 
-        do i=1,n 
-          aver_proc = aver_proc + w(i)*x(i)
-        enddo 
-
-        end function aver_proc  
-
-      
       end module cdat
