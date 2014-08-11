@@ -30,9 +30,7 @@
         enddo 
 
       enddo
-
-! --- update c 
-      call prop_c(s,mat,am,dt,ndim,ntraj,w,x,p,g,dg)
+      
       return 
       end subroutine 
 
@@ -47,7 +45,7 @@
       
       real*8,    intent(in) :: dt,am(ndim),mat1(nb,nb)
 
-      real*8 :: f(nb),df(ndim,nb),s(nb,nb),sinv(nb,nb),mat2(nb,nb)
+      real*8 :: f(nb),df(ndim,nb),s(nb,nb),sinv(nb,nb),mat2(nb,nb), mats(nb,nb)
 
       complex*16 :: cor,mat(nb,nb),c(nb),dc(nb)
 
@@ -111,8 +109,10 @@
 
       dc = matmul(mat,c)
 
-      call inverse(s,sinv,nb)
-
+      mats = s 
+      
+      call inverse(mats,sinv,nb)
+      
       dc = matmul(sinv,dc)
  
       do j=1,nb 

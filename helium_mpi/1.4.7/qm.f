@@ -47,7 +47,7 @@
       
       real*8      :: am(NATOM3)
 
-      integer     :: idum(NATOM3),myid, ierr, numprocs, root, tag
+      integer     :: myid, ierr, numprocs, root, tag
 
 ! --- this common block is used to enable interpolation in the potential
 !     energy lookup table in the subroutine local below.
@@ -132,7 +132,7 @@ C     +       '------------------------------'/)
 
       Ndim = NATOM3
 
-      call initial(ndim)
+      call init_pars(ndim)
 
       den = 5.231d-3
 !      den = 4.61421d-3 ! Hinde 
@@ -163,12 +163,9 @@ C     +       '------------------------------'/)
 
       open (8, file=ltfile, status='old')
 
-      read (8, *) nlpts
-
-! --- read the edge lengths of the supercell.
+      read (8, *) nlpts  ! number of atoms in lattice file 
       
-      read (8, *) xlen, ylen, zlen
-
+      read (8, *) xlen, ylen, zlen ! --- read the edge lengths of the supercell.
 
       if(myid == root) then
       
@@ -387,11 +384,11 @@ C     +       '------------------------------'/)
      +         cp(ndim+1,ndim),cr(ndim+1,ndim))
 
       allocate(g(nb))
+      
 ! --- initial parameters 
 
       dt2 = dt/2d0 
       t   = 0d0
-      pow = 6d0
 
       do i=1,Ndim
         am(i) = am0*1836.15d0
@@ -436,26 +433,8 @@ C     +       '------------------------------'/)
 
       if(iread == 0) then
       
-      call seed(idum,Ndim)
-
-! --- initial Lagrangian grid points (evolve with time)
-      do i=1,Ntraj
-        do j=1,Ndim
-1100      x(j,i)=gasdev(idum(j))
-          x(j,i)=x(j,i)/dsqrt(4d0*alpha(j))+x0(j)
-          if((x(j,i)-x0(j))**2 .gt. pow/2d0/alpha(j)) goto 1100
-        enddo
-      enddo
-
-! --- initial momentum for QTs and weights
-
-      do i=1,Ntraj
-        do j=1,Ndim
-            p(j,i) = p0(j)
-            rp(j,i) = -2d0*alpha(j)*(x(j,i)-x0(j))
-        enddo
-      enddo
-      
+        call init_traj(ndim,ntraj,alpha,x,x0,p,p0,rp,w)
+       
 ! --- continue job from last checkpoint
       elseif(iread == 1) then
 
@@ -474,6 +453,11 @@ C     +       '------------------------------'/)
 !---- expectation value of x(1,ntraj)--------
 
       w = 1d0/dble(ntraj)
+      
+      g = (0d0,0d0)
+      do j=1,ndim 
+        g(j) = (1d0,0d0) 
+      enddo 
       
       av = 0d0
       do i=1,ntraj
@@ -506,19 +490,17 @@ C     +       '------------------------------'/)
 !       call mpi_bcast(cf,ndim,mpi_double_precision,root,
 !     +               mpi_comm_world,ierr)
 
-      if(myid == root) then
+!      if(myid == root) then
 
 !        time = mpi_wtime() - time
-
 !        write(*,6678) time
-!
 !6678    format('Scatter work finished. Time for initial scattering',
 !     +         f12.6/)
         
-        write(*,6679) 
-
-6679    format('Now propagate quantum trajectories...')
-      endif
+C        write(*,6679) 
+C
+C6679    format('Now propagate quantum trajectories...')
+C      endif
 
 ! --- trajectories propagation      
 
@@ -532,6 +514,7 @@ C     +       '------------------------------'/)
 
         call prefit(ntraj_proc,ndim,wp,x_proc,p_proc,rp_proc,
      +              s1p,cpp,crp,mat_proc)
+     
 
         call mpi_reduce(s1p,s1,(ndim+1)*(ndim+1),MPI_DOUBLE_PRECISION,
      +                  MPI_SUM,0,MPI_COMM_WORLD,ierr)
@@ -569,6 +552,8 @@ C     +       '------------------------------'/)
 
 ! ----- compute local correlation C(AB), here A=B=x
         call corr(am,dt,nb,ndim,ntraj_proc,wp,x_proc,g,cor_proc) 
+        
+        
         
         call mpi_reduce(cor_proc,cor,1,mpi_double_complex,mpi_sum,0, 
      +        mpi_comm_world, ierr)     
@@ -676,7 +661,7 @@ C     +       '------------------------------'/)
         call comp(am,wp,ntraj_proc,ndim,eup,cp,cr,cp2,cr2,
      +            x_proc,ap_proc,du_proc,fr_proc)
 
-        call eula(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
+        call traj(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
      +            rp_proc,ap_proc,wp,du_proc,fr_proc,proc_po,enk_proc)
 
 
@@ -711,11 +696,10 @@ C     +       '------------------------------'/)
 ! ----- write data to files 
         if(myid == root) then
           
-          time = mpi_wtime() - time 
-          write(*,6690) time
-6690      format('time to gather {x,p,r}',f12.6/)
+C          time = mpi_wtime() - time 
+C          write(*,6690) time
+C6690      format('time to gather {x,p,r}',f12.6/)
        
-
           write(11,1000) t,enk,po,qu,(po+enk+qu)
           call flush(11)
 
@@ -759,7 +743,10 @@ C     +       '------------------------------'/)
 ! --- deallocate arrays
       deallocate(fr_proc,du_proc,ap_proc,x_proc,p_proc,rp_proc)
 
-      write(6,*) 'Job finished.'
+      write(6,8888) 
+8888  format('*******************'/,  
+     +       '** Job finished. **'/,    
+     +       '*******************')
 
       endif ! root
       
@@ -768,7 +755,7 @@ C     +       '------------------------------'/)
 1000  format(20(e14.7,1x))
       
       stop
-      end program
+      end program 
 
 
 ! ----------------------------------------------------------------------
@@ -787,20 +774,7 @@ C     +       '------------------------------'/)
 
         stop
       end subroutine
-! ---------------------------------------------------------------
-!     random number seeds
-! ---------------------------------------------------------------
-      subroutine seed(idum,Ndim)
-      implicit real*8(a-h,o-z)
-      integer*4, intent(IN) :: Ndim
-      integer*4, intent(OUT) :: idum(Ndim)
 
-      do i=1,Ndim
-        idum(i) = 5 + i
-      enddo
-
-      return
-      end subroutine
 !--------------------------------------
 !      end subroutine
 ! ----------------------------------------------------------------
@@ -808,11 +782,11 @@ C     +       '------------------------------'/)
 ! --- each processor have part of the full matrix {x,p,r}, 
 !     of size (NDIM,NTRAJ_PROC), run independently
 ! ----------------------------------------------------------------
-      subroutine eula(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
+      subroutine traj(myid,dt,ndim,ntraj_proc,cf,am,x_proc,p_proc,
      +                rp_proc,ap_proc,wp,du_proc,fr_proc,vproc,
      +                enk_proc)
 
-      use cdat, only : aver_proc => aver  
+      use cdat, only : aver_traj 
 
       implicit real*8(a-h, o-z)
 
@@ -866,7 +840,7 @@ C     +       '------------------------------'/)
         enddo 
       enddo 
       
-      vproc = aver(ntraj_proc,wp,pe)
+      vproc = aver_traj(ntraj_proc,wp,pe)
 
       return
       end subroutine
@@ -877,7 +851,7 @@ C     +       '------------------------------'/)
 
 !-----------------------------------------------------------
 
-      subroutine prefit(ntraj_proc,ndim,wp,x_proc,p_proc,rp_proc,
+      subroutine prefit(ntraj_proc,ndim,w_proc,x_proc,p_proc,rp_proc,
      +           s1,cp,cr,mat)
 
       use cdat, only : nb 
@@ -891,8 +865,8 @@ C     +       '------------------------------'/)
 
       real*8, intent(out), dimension(ndim+1,ndim+1) :: s1,mat 
 
-      real*8 :: f(ndim+1),wp(ntraj_proc),cp(ndim+1,ndim),cr(ndim+1,ndim)
-     +          , df(ndim,nb)
+      real*8 :: f(ndim+1),w_proc(ntraj_proc),cp(ndim+1,ndim),
+     +          cr(ndim+1,ndim),df(ndim,nb)
 
       s1 = 0d0
       cp = 0d0
@@ -910,13 +884,13 @@ C     +       '------------------------------'/)
         
         do k2 = 1,ndim+1
           do k1=1,k2
-            s1(k1,k2) = s1(k1,k2)+f(k1)*f(k2)*wp(i)
+            s1(k1,k2) = s1(k1,k2)+f(k1)*f(k2)*w_proc(i)
           enddo
         enddo
 
         do j=1,ndim 
           do k=1,nb 
-            mat(k,j) = mat(k,j)+p(j,i)*f(k)*df(j,j)*w(i)
+            mat(k,j) = mat(k,j)+p_proc(j,i)*f(k)*df(j,j)*w_proc(i)
           enddo 
         enddo 
 
@@ -928,8 +902,8 @@ C     +       '------------------------------'/)
         
         do k=1,ndim
           do j=1,ndim+1
-            cp(j,k) = cp(j,k)+f(j)*p_proc(k,i)*wp(i)
-            cr(j,k) = cr(j,k)+f(j)*rp_proc(k,i)*wp(i)
+            cp(j,k) = cp(j,k)+f(j)*p_proc(k,i)*w_proc(i)
+            cr(j,k) = cr(j,k)+f(j)*rp_proc(k,i)*w_proc(i)
           enddo
         enddo
       enddo
@@ -947,7 +921,7 @@ C     +       '------------------------------'/)
 
 ! --- intialize global values in module cdat 
 
-      subroutine initial(ndim)
+      subroutine init_pars(ndim)
 
       use cdat, only : nb 
 
@@ -956,3 +930,44 @@ C     +       '------------------------------'/)
       nb = ndim+1 
 
       end subroutine
+      
+! --- initialize  trajectories 
+      
+      subroutine init_traj(ndim,ntraj,alpha,x,x0,p,p0,rp,w) 
+      
+      use cdat, only : seed
+        
+      implicit real*8(a-h,o-z) 
+      
+      real*8, dimension(ndim,ntraj) :: x,p,r,rp
+      
+      real*8, dimension(ndim) :: x0,p0,alpha 
+      
+      real*8 :: w(ntraj)
+      
+      integer :: idum(ndim) 
+      
+      call seed(idum,Ndim)
+      
+      pow = 6d0
+
+! --- initial Lagrangian grid points (evolve with time)
+      do i=1,Ntraj
+        do j=1,Ndim
+1100      x(j,i)=gasdev(idum(j))
+          x(j,i)=x(j,i)/dsqrt(4d0*alpha(j))+x0(j)
+          if((x(j,i)-x0(j))**2 .gt. pow/2d0/alpha(j)) goto 1100
+        enddo
+      enddo
+
+! --- initial momentum for QTs and weights
+
+      do i=1,Ntraj
+        do j=1,Ndim
+            p(j,i) = p0(j)
+            rp(j,i) = -2d0*alpha(j)*(x(j,i)-x0(j))
+        enddo
+      enddo
+      
+      return 
+      end subroutine 
