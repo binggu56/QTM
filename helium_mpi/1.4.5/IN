@@ -1,0 +1,6 @@
+19200             # number of trajectories
+1,3d0         # time steps
+8d0		          # mass in units of proton mass
+0.75d0            # initial guassian width
+40d0              # friction coeff
+0                 # iread 0: no input file; 1: read from input file 'temp.dat'
