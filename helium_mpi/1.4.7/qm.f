@@ -726,22 +726,22 @@ C6690      format('time to gather {x,p,r}',f12.6/)
 
       if (myid == root) then
 
-      open(13,file='temp.dat',action='write')
+      open(103,file='init.dat',action='write')
       
         do i=1,Ntraj
           do j=1,Ndim
-            write(13,1000) x(j,i),p(j,i),rp(j,i)
+            write(103,1000) x(j,i),p(j,i),rp(j,i)
           enddo
         enddo
 
-      close(13)
+      close(103)
 
       close(11)
       close(12)
       close(14)
 
 ! --- deallocate arrays
-      deallocate(fr_proc,du_proc,ap_proc,x_proc,p_proc,rp_proc)
+!      deallocate(fr_proc,du_proc,ap_proc,x_proc,p_proc,rp_proc)
 
       write(6,8888) 
 8888  format('*******************'/,  
@@ -752,7 +752,7 @@ C6690      format('time to gather {x,p,r}',f12.6/)
       
       call mpi_finalize(ierr)
 
-1000  format(20(e14.7,1x))
+1000  format(100(e14.7,1x))
       
       stop
       end program 
@@ -824,9 +824,9 @@ C6690      format('time to gather {x,p,r}',f12.6/)
         pe(i) = vloc+vlong
 
         do j=1,Ndim
+            x_proc(j,i)=x_proc(j,i)+p_proc(j,i)*dt/am(j)
             p_proc(j,i)=p_proc(j,i)+(-dv(j)-dvl(j)-
      +                  du_proc(j,i)-cf(j)*p_proc(j,i)/am(j))*dt
-            x_proc(j,i)=x_proc(j,i)+ap_proc(j,i)*dt/am(j)
             rp_proc(j,i)=rp_proc(j,i)+fr_proc(j,i)*dt
         enddo
 
